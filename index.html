@@ -3,454 +3,871 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Emsland Spielezentrum</title>
+<title>Mein Student Dashboard</title>
+
+https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.jsscript>
 
 <style>
-body {
-    font-family: Arial, sans-serif;
-    max-width: 900px;
-    margin: 30px auto;
-    text-align: center;
-    background: #f4f4f4;
-    padding: 10px;
+:root {
+    --bg: #0f172a;
+    --card: rgba(255, 255, 255, 0.08);
+    --card2: rgba(255, 255, 255, 0.12);
+    --text: #f8fafc;
+    --muted: #94a3b8;
+    --blue: #38bdf8;
+    --green: #22c55e;
+    --red: #ef4444;
+    --yellow: #facc15;
+    --border: rgba(255,255,255,0.16);
 }
 
-#app-container {
-    background: white;
-    padding: 20px;
-    border-radius: 10px;
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background:
+        radial-gradient(circle at top left, #1e40af, transparent 30%),
+        radial-gradient(circle at top right, #0f766e, transparent 30%),
+        var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+}
+
+.app {
+    max-width: 1250px;
+    margin: 0 auto;
+    padding: 24px;
 }
 
 header {
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.header-title h1 {
+    margin: 0;
+    font-size: 34px;
+}
+
+.header-title p {
+    margin: 6px 0 0;
+    color: var(--muted);
+}
+
+.date-box {
+    background: var(--card);
+    border: 1px solid var(--border);
+    padding: 14px 18px;
+    border-radius: 18px;
+    text-align: right;
+}
+
+.nav {
+    display: flex;
     gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 24px;
 }
 
-nav {
-    margin: 20px 0;
-    display:flex;
-    gap:10px;
-    flex-wrap:wrap;
-    justify-content:center;
-}
-
-.game-btn {
-    padding: 12px 18px;
+.nav button {
+    border: 1px solid var(--border);
+    background: var(--card);
+    color: var(--text);
+    padding: 12px 16px;
+    border-radius: 999px;
     cursor: pointer;
-    border: none;
-    background: #0078D4;
-    color: white;
-    border-radius: 6px;
     font-size: 15px;
 }
 
-.game-btn:hover { background:#005ea2 }
-
-#game-area { margin-top: 10px }
-
-button.answer {
-    display: block;
-    width: 100%;
-    margin: 8px 0;
-    padding: 12px;
-    cursor: pointer;
-    border: none;
-    background: #0078D4;
-    color: white;
-    border-radius: 5px;
-    font-size: 16px;
+.nav button:hover,
+.nav button.active {
+    background: var(--blue);
+    color: #020617;
 }
 
-button.answer:hover { background:#005ea2 }
-
-#result { font-size: 20px; margin-top: 12px; font-weight: bold }
-
-#topbar { display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:10px }
-
-#timer, #score, #highscore { font-weight: bold }
-
-.memory-grid { display:grid; grid-template-columns: repeat(4, 1fr); gap:10px; margin: 12px 0 }
+.grid {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 18px;
+}
 
 .card {
-    background:#0078D4; color:white; padding:18px; border-radius:8px; font-size:18px; cursor:pointer; user-select:none;
-    display:flex; align-items:center; justify-content:center; height:70px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 22px;
+    padding: 20px;
+    backdrop-filter: blur(12px);
+    box-shadow: 0 20px 50px rgba(0,0,0,0.2);
 }
 
-.card.flipped { background:#e0e0e0; color:#111 }
-
-.big-button {
-    padding: 30px 20px; font-size: 30px; border-radius: 12px; background: #0078D4; color: white; border:none; cursor:pointer;
+.card h2 {
+    margin-top: 0;
+    font-size: 22px;
 }
 
-.small { font-size: 14px }
+.card h3 {
+    margin-top: 0;
+}
 
-footer { margin-top: 18px; font-size:13px; color:#666 }
+.col-3 { grid-column: span 3; }
+.col-4 { grid-column: span 4; }
+.col-5 { grid-column: span 5; }
+.col-6 { grid-column: span 6; }
+.col-7 { grid-column: span 7; }
+.col-8 { grid-column: span 8; }
+.col-12 { grid-column: span 12; }
 
+.stat {
+    font-size: 32px;
+    font-weight: bold;
+}
+
+.muted {
+    color: var(--muted);
+}
+
+input, select, textarea {
+    width: 100%;
+    padding: 12px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    background: rgba(15, 23, 42, 0.75);
+    color: var(--text);
+    outline: none;
+    margin-bottom: 10px;
+}
+
+input::placeholder,
+textarea::placeholder {
+    color: #64748b;
+}
+
+button.primary {
+    background: var(--blue);
+    color: #020617;
+    border: none;
+    padding: 12px 16px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+button.secondary {
+    background: var(--card2);
+    color: var(--text);
+    border: 1px solid var(--border);
+    padding: 10px 14px;
+    border-radius: 12px;
+    cursor: pointer;
+}
+
+button.danger {
+    background: rgba(239, 68, 68, 0.15);
+    color: #fecaca;
+    border: 1px solid rgba(239, 68, 68, 0.4);
+    padding: 8px 10px;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+.list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.list-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+}
+
+.badge {
+    display: inline-block;
+    padding: 5px 10px;
+    border-radius: 999px;
+    background: rgba(56,189,248,0.16);
+    color: #bae6fd;
+    font-size: 13px;
+}
+
+.progress {
+    width: 100%;
+    height: 12px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 999px;
+    overflow: hidden;
+    margin-top: 8px;
+}
+
+.progress-fill {
+    height: 100%;
+    width: 0%;
+    background: var(--green);
+    transition: width 0.3s;
+}
+
+.section {
+    display: none;
+}
+
+.section.active {
+    display: block;
+}
+
+.calendar-frame {
+    width: 100%;
+    height: 650px;
+    border: 0;
+    border-radius: 18px;
+    background: white;
+}
+
+.ocr-box {
+    white-space: pre-wrap;
+    background: rgba(0,0,0,0.25);
+    padding: 12px;
+    border-radius: 12px;
+    max-height: 260px;
+    overflow: auto;
+    color: #dbeafe;
+}
+
+.category-row {
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border);
+    padding: 8px 0;
+}
+
+footer {
+    margin-top: 30px;
+    text-align: center;
+    color: var(--muted);
+    font-size: 13px;
+}
+
+@media (max-width: 900px) {
+    .col-3, .col-4, .col-5, .col-6, .col-7, .col-8, .col-12 {
+        grid-column: span 12;
+    }
+
+    header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .date-box {
+        text-align: left;
+        width: 100%;
+    }
+}
 </style>
 </head>
+
 <body>
+<div class="app">
 
-<div id="app-container">
-    <header>
-        <h1>Emsland Spielezentrum</h1>
-        <div class="small">Spieldauer pro Spiel: 5 Minuten</div>
-    </header>
+<header>
+    <div class="header-title">
+        <h1>Mein Student Dashboard</h1>
+        <p>Finanzen, Kalender, Einkaufsliste, Belege und Alltag an einem Ort.</p>
+    </div>
+    <div class="date-box">
+        <div id="todayDate"></div>
+        <div class="muted" id="todayTime"></div>
+    </div>
+</header>
 
-    <nav>
-        <button class="game-btn" onclick="showMenu()">Menü</button>
-        <button class="game-btn" onclick="startGame('quiz')">Quiz</button>
-        <button class="game-btn" onclick="startGame('clicker')">Schnellklick</button>
-        <button class="game-btn" onclick="startGame('memory')">Memory</button>
-        <button class="game-btn" onclick="startGame('math')">Mathe-Flash</button>
-    </nav>
+<nav class="nav">
+    <button class="active" onclick="showSection('overview', this)">Übersicht</button>
+    <button onclick="showSection('finance', this)">Finanzen</button>
+    <button onclick="showSection('shopping', this)">Einkaufsliste</button>
+    <button onclick="showSection('receipts', this)">Belege scannen</button>
+    <button onclick="showSection('calendar', this)">Kalender</button>
+    <button onclick="showSection('notes', this)">Notizen</button>
+</nav>
 
-    <div id="game-area">
-        <div id="menu">
-            <h2>Wähle ein Spiel</h2>
-            <p>4 Spiele, jeweils ca. 5 Minuten: Quiz, Schnellklick, Memory, Mathe-Flash. Jeder Modus speichert deinen persönlichen Highscore lokal im Browser.</p>
-            <div style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
-                <div style="min-width:200px; text-align:left; padding:10px; border-radius:8px; background:#fafafa;"> 
-                    <h3>Quiz</h3>
-                    <p>Mehrere Auswahlfragen rund ums Emsland. Punkte für richtige Antworten.</p>
-                    <div>Highscore: <span id="hs-quiz">0</span></div>
-                </div>
-                <div style="min-width:200px; text-align:left; padding:10px; border-radius:8px; background:#fafafa;"> 
-                    <h3>Schnellklick</h3>
-                    <p>Klicke so oft du kannst in 5 Minuten.</p>
-                    <div>Highscore: <span id="hs-clicker">0</span></div>
-                </div>
-                <div style="min-width:200px; text-align:left; padding:10px; border-radius:8px; background:#fafafa;"> 
-                    <h3>Memory</h3>
-                    <p>Paare finden. 12 Karten (6 Paare).</p>
-                    <div>Highscore: <span id="hs-memory">0</span></div>
-                </div>
-                <div style="min-width:200px; text-align:left; padding:10px; border-radius:8px; background:#fafafa;"> 
-                    <h3>Mathe-Flash</h3>
-                    <p>Schnelle Rechenaufgaben — so viele richtig wie möglich in 5 Minuten.</p>
-                    <div>Highscore: <span id="hs-math">0</span></div>
-                </div>
-            </div>
+<section id="overview" class="section active">
+    <div class="grid">
+        <div class="card col-3">
+            <h3>Monatsbudget</h3>
+            <div class="stat" id="overviewBudget">0,00 €</div>
+            <div class="muted">gesetztes Limit</div>
         </div>
 
-        <div id="game" style="display:none; text-align:left;">
-            <div id="topbar">
-                <div>Spiel: <span id="game-title">-</span></div>
-                <div>Zeit: <span id="timer">05:00</span></div>
-                <div>Score: <span id="score">0</span></div>
-                <div>Highscore: <span id="highscore">0</span></div>
-                <div><button class="game-btn" onclick="endEarly()">Beenden</button></div>
+        <div class="card col-3">
+            <h3>Ausgegeben</h3>
+            <div class="stat" id="overviewSpent">0,00 €</div>
+            <div class="muted">diesen Monat</div>
+        </div>
+
+        <div class="card col-3">
+            <h3>Restbudget</h3>
+            <div class="stat" id="overviewLeft">0,00 €</div>
+            <div class="muted">noch verfügbar</div>
+        </div>
+
+        <div class="card col-3">
+            <h3>Einkäufe</h3>
+            <div class="stat" id="overviewShopping">0</div>
+            <div class="muted">offene Artikel</div>
+        </div>
+
+        <div class="card col-7">
+            <h2>Budget-Fortschritt</h2>
+            <div class="progress">
+                <div class="progress-fill" id="budgetProgress"></div>
             </div>
+            <p class="muted" id="budgetHint">Noch kein Budget gesetzt.</p>
+        </div>
 
-            <div id="play-area"></div>
+        <div class="card col-5">
+            <h2>Schnellaktionen</h2>
+            <button class="primary" onclick="showSectionById('shopping')">Einkauf hinzufügen</button>
+            <br><br>
+            <button class="primary" onclick="showSectionById('finance')">Ausgabe erfassen</button>
+            <br><br>
+            <button class="primary" onclick="showSectionById('receipts')">Beleg hochladen</button>
+        </div>
 
-            <div id="result"></div>
+        <div class="card col-6">
+            <h2>Letzte Ausgaben</h2>
+            <div id="recentExpenses" class="list"></div>
+        </div>
+
+        <div class="card col-6">
+            <h2>Offene Einkaufsliste</h2>
+            <div id="overviewShoppingList" class="list"></div>
         </div>
     </div>
+</section>
 
-    <footer>
-        <p>Deine Highscores werden nur lokal in diesem Browser gespeichert (localStorage).</p>
-    </footer>
+<section id="finance" class="section">
+    <div class="grid">
+        <div class="card col-4">
+            <h2>Budget einstellen</h2>
+            <input id="budgetInput" type="number" step="0.01" placeholder="Monatsbudget, z. B. 450">
+            <button class="primary" onclick="saveBudget()">Budget speichern</button>
+            <p class="muted">Tipp: Als Student lohnt es sich, Essen, Freizeit, Auto/ÖPNV und fixe Kosten getrennt zu beobachten.</p>
+        </div>
+
+        <div class="card col-4">
+            <h2>Ausgabe hinzufügen</h2>
+            <input id="expenseName" placeholder="Beschreibung, z. B. Lidl Einkauf">
+            <input id="expenseAmount" type="number" step="0.01" placeholder="Betrag, z. B. 12.49">
+            <select id="expenseCategory">
+                <option value="Lebensmittel">Lebensmittel</option>
+                <option value="Miete/Wohnen">Miete/Wohnen</option>
+                <option value="Transport">Transport</option>
+                <option value="Studium">Studium</option>
+                <option value="Freizeit">Freizeit</option>
+                <option value="Abos">Abos</option>
+                <option value="Sonstiges">Sonstiges</option>
+            </select>
+            <button class="primary" onclick="addExpense()">Ausgabe speichern</button>
+        </div>
+
+        <div class="card col-4">
+            <h2>Kategorien</h2>
+            <div id="categorySummary"></div>
+        </div>
+
+        <div class="card col-12">
+            <h2>Alle Ausgaben</h2>
+            <div id="expenseList" class="list"></div>
+        </div>
+    </div>
+</section>
+
+<section id="shopping" class="section">
+    <div class="grid">
+        <div class="card col-5">
+            <h2>Einkaufsliste</h2>
+            <input id="shoppingInput" placeholder="Artikel, z. B. Nudeln">
+            <button class="primary" onclick="addShoppingItem()">Hinzufügen</button>
+            <p class="muted">Die Liste wird lokal im Browser gespeichert.</p>
+        </div>
+
+        <div class="card col-7">
+            <h2>Offene Artikel</h2>
+            <div id="shoppingList" class="list"></div>
+        </div>
+    </div>
+</section>
+
+<section id="receipts" class="section">
+    <div class="grid">
+        <div class="card col-5">
+            <h2>Beleg scannen</h2>
+            <p class="muted">
+                Lade ein Foto von deinem Einkaufszettel hoch. Die Website versucht, Text und Preise zu erkennen.
+            </p>
+
+            <input id="receiptImage" type="file" accept="image/*">
+            <button class="primary" onclick="scanReceipt()">Beleg auslesen</button>
+
+            <p id="ocrStatus" class="muted"></p>
+        </div>
+
+        <div class="card col-7">
+            <h2>Erkannter Text</h2>
+            <div id="ocrText" class="ocr-box">Noch kein Beleg gescannt.</div>
+        </div>
+
+        <div class="card col-12">
+            <h2>Erkannte Beträge</h2>
+            <p class="muted">
+                Prüfe die Beträge kurz. OCR kann sich bei Fotos manchmal irren.
+            </p>
+            <div id="detectedAmounts" class="list"></div>
+        </div>
+    </div>
+</section>
+
+<section id="calendar" class="section">
+    <div class="grid">
+        <div class="card col-12">
+            <h2>Mein Kalender</h2>
+            <p class="muted">
+                Füge unten deinen Google-Kalender-Einbettungslink ein. Den Link bekommst du in Google Kalender unter Einstellungen → Kalender integrieren → Einbettungscode.
+            </p>
+
+            <input id="calendarLinkInput" placeholder="Google Kalender iframe-Link oder src-Link hier einfügen">
+            <button class="primary" onclick="saveCalendarLink()">Kalender speichern</button>
+
+            <br><br>
+
+            <iframe id="calendarFrame" class="calendar-frame"></iframe>
+        </div>
+    </div>
+</section>
+
+<section id="notes" class="section">
+    <div class="grid">
+        <div class="card col-6">
+            <h2>Schnelle Notizen</h2>
+            <textarea id="notesInput" rows="12" placeholder="Schreibe hier wichtige Notizen, Ideen oder To-dos..."></textarea>
+            <button class="primary" onclick="saveNotes()">Notizen speichern</button>
+        </div>
+
+        <div class="card col-6">
+            <h2>Nützliche Student-Features</h2>
+            <div class="list">
+                <div class="list-item">
+                    <span>Monatsbudget kontrollieren</span>
+                    <span class="badge">Finanzen</span>
+                </div>
+                <div class="list-item">
+                    <span>Einkaufszettel speichern</span>
+                    <span class="badge">Alltag</span>
+                </div>
+                <div class="list-item">
+                    <span>Belege per Foto auslesen</span>
+                    <span class="badge">OCR</span>
+                </div>
+                <div class="list-item">
+                    <span>Kalender einbinden</span>
+                    <span class="badge">Planung</span>
+                </div>
+                <div class="list-item">
+                    <span>Notizen für Uni und Arbeit</span>
+                    <span class="badge">Organisation</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<footer>
+    Persönliches Dashboard. Daten werden lokal im Browser gespeichert.
+</footer>
+
 </div>
 
 <script>
-// Allgemeine Einstellungen
-const GAME_DURATION = 5 * 60; // 5 Minuten in Sekunden
-let timerInterval = null;
-let remainingSeconds = GAME_DURATION;
-let currentGame = null;
-let currentScore = 0;
+let expenses = JSON.parse(localStorage.getItem("expenses") || "[]");
+let shoppingItems = JSON.parse(localStorage.getItem("shoppingItems") || "[]");
+let monthlyBudget = parseFloat(localStorage.getItem("monthlyBudget") || "0");
 
-function formatTime(s){
-    const m = Math.floor(s/60).toString().padStart(2,'0');
-    const sec = (s%60).toString().padStart(2,'0');
-    return `${m}:${sec}`;
+function formatEuro(value) {
+    return Number(value).toLocaleString("de-DE", {
+        style: "currency",
+        currency: "EUR"
+    });
 }
 
-function loadHighscores(){
-    document.getElementById('hs-quiz').innerText = localStorage.getItem('hs_quiz') || 0;
-    document.getElementById('hs-clicker').innerText = localStorage.getItem('hs_clicker') || 0;
-    document.getElementById('hs-memory').innerText = localStorage.getItem('hs_memory') || 0;
-    document.getElementById('hs-math').innerText = localStorage.getItem('hs_math') || 0;
+function showSection(id, button) {
+    document.querySelectorAll(".section").forEach(sec => sec.classList.remove("active"));
+    document.getElementById(id).classList.add("active");
+
+    document.querySelectorAll(".nav button").forEach(btn => btn.classList.remove("active"));
+    if (button) button.classList.add("active");
+
+    refreshAll();
 }
 
-function showMenu(){
-    stopTimer();
-    document.getElementById('menu').style.display = '';
-    document.getElementById('game').style.display = 'none';
-    currentGame = null;
-    document.getElementById('result').innerText = '';
-    loadHighscores();
-}
-
-function startGame(id){
-    // reset
-    stopTimer();
-    currentGame = id;
-    remainingSeconds = GAME_DURATION;
-    currentScore = 0;
-    document.getElementById('menu').style.display = 'none';
-    document.getElementById('game').style.display = '';
-    document.getElementById('game-title').innerText = gameTitle(id);
-    document.getElementById('timer').innerText = formatTime(remainingSeconds);
-    document.getElementById('score').innerText = currentScore;
-    document.getElementById('highscore').innerText = localStorage.getItem('hs_' + id) || 0;
-    document.getElementById('result').innerText = '';
-
-    // start timer
-    timerInterval = setInterval(() =>{
-        remainingSeconds--;
-        document.getElementById('timer').innerText = formatTime(remainingSeconds);
-        if(remainingSeconds <= 0){
-            stopTimer();
-            finishGame();
+function showSectionById(id) {
+    const buttons = document.querySelectorAll(".nav button");
+    buttons.forEach(btn => {
+        if (btn.textContent.toLowerCase().includes(sectionName(id))) {
+            btn.click();
         }
-    }, 1000);
-
-    // start specific game
-    if(id === 'quiz') startQuiz();
-    if(id === 'clicker') startClicker();
-    if(id === 'memory') startMemory();
-    if(id === 'math') startMath();
-}
-
-function stopTimer(){
-    if(timerInterval) { clearInterval(timerInterval); timerInterval = null; }
-}
-
-function endEarly(){
-    // confirm
-    if(confirm('Willst du das Spiel vorzeitig beenden?')){
-        stopTimer();
-        finishGame();
-    }
-}
-
-function finishGame(){
-    // show result and save highscore
-    document.getElementById('result').innerText = `Spiel beendet! Dein Ergebnis: ${currentScore}`;
-    const key = 'hs_' + currentGame;
-    const prev = parseInt(localStorage.getItem(key) || '0', 10);
-    if(currentScore > prev){
-        localStorage.setItem(key, currentScore);
-        document.getElementById('result').innerText += '\nNeuer Highscore!';
-    }
-    loadHighscores();
-}
-
-function gameTitle(id){
-    switch(id){
-        case 'quiz': return 'Quiz';
-        case 'clicker': return 'Schnellklick';
-        case 'memory': return 'Memory';
-        case 'math': return 'Mathe-Flash';
-    }
-}
-
-/* ------------------ QUIZ ------------------ */
-const quizQuestions = [
-{
-    question: "Welche Stadt ist die größte im Emsland?",
-    answers: ["Lingen", "Meppen", "Papenburg", "Haselünne"],
-    correct: 0
-},
-{
-    question: "Welcher Fluss gab dem Emsland seinen Namen?",
-    answers: ["Hase", "Ems", "Weser", "Elbe"],
-    correct: 1
-},
-{
-    question: "Für welche Werft ist Papenburg bekannt?",
-    answers: ["Meyer Werft", "Blohm+Voss", "Lürssen", "HDW"],
-    correct: 0
-},
-{
-    question: "Welche Farbe hat das Wappen des Landkreises Emsland hauptsächlich?",
-    answers: ["Blau", "Rot", "Grün", "Gelb"],
-    correct: 0
-},
-{
-    question: "In welcher Stadt befindet sich die Hochschule Osnabrück Campus Lingen?",
-    answers: ["Meppen", "Papenburg", "Lingen", "Sögel"],
-    correct: 2
-},
-// zusätzliche Fragen für etwas Variation
-{
-    question: "Welcher Landkreis grenzt nicht an das Emsland?",
-    answers: ["Grafschaft Bentheim", "Emsigerland", "Osnabrück", "Cloppenburg"],
-    correct: 1
-},
-{
-    question: "Welche Industrie ist in Papenburg besonders wichtig?",
-    answers: ["Schiffbau", "Automobilbau", "Textil", "Elektronik"],
-    correct: 0
-}
-];
-
-let quizOrder = [];
-let quizIndex = 0;
-
-function startQuiz(){
-    // prepare: shuffle order
-    quizOrder = quizQuestions.map((_,i)=>i).sort(()=>Math.random()-0.5);
-    quizIndex = 0;
-    currentScore = 0;
-    renderQuizQuestion();
-}
-
-function renderQuizQuestion(){
-    const area = document.getElementById('play-area');
-    area.innerHTML = '';
-    if(quizIndex >= quizOrder.length){
-        // reshuffle and continue within time
-        quizOrder = quizQuestions.map((_,i)=>i).sort(()=>Math.random()-0.5);
-        quizIndex = 0;
-    }
-    const q = quizQuestions[quizOrder[quizIndex]];
-    const h = document.createElement('h2'); h.innerText = q.question; area.appendChild(h);
-
-    const answersDiv = document.createElement('div');
-    q.answers.forEach((a,i)=>{
-        const btn = document.createElement('button');
-        btn.className = 'answer';
-        btn.innerText = a;
-        btn.onclick = ()=>{
-            if(i === q.correct){ currentScore++; document.getElementById('score').innerText = currentScore; }
-            quizIndex++;
-            renderQuizQuestion();
-        };
-        answersDiv.appendChild(btn);
     });
-    area.appendChild(answersDiv);
 }
 
-/* ------------------ CLICKER ------------------ */
-let clickCount = 0;
-function startClicker(){
-    clickCount = 0;
-    currentScore = 0;
-    const area = document.getElementById('play-area');
-    area.innerHTML = '';
-    const info = document.createElement('div'); info.innerHTML = '<h2>Klicke so oft du kannst!</h2>';
-    area.appendChild(info);
-    const btn = document.createElement('button');
-    btn.className = 'big-button'; btn.innerText = 'KLICK';
-    btn.onclick = ()=>{ clickCount++; currentScore = clickCount; document.getElementById('score').innerText = currentScore; }
-    area.appendChild(btn);
+function sectionName(id) {
+    if (id === "finance") return "finanzen";
+    if (id === "shopping") return "einkauf";
+    if (id === "receipts") return "belege";
+    if (id === "calendar") return "kalender";
+    if (id === "notes") return "notizen";
+    return "übersicht";
 }
 
-/* ------------------ MEMORY ------------------ */
-let memoryState = {
-    cards: [],
-    first: null,
-    matched: 0
-};
-
-function startMemory(){
-    // create 6 pairs (12 cards)
-    const symbols = ['A','B','C','D','E','F'];
-    const pool = symbols.concat(symbols).sort(()=>Math.random()-0.5);
-    memoryState.cards = pool.map((val, idx)=>({val, idx, flipped:false}));
-    memoryState.first = null;
-    memoryState.matched = 0;
-    currentScore = 0;
-    renderMemory();
-}
-
-function renderMemory(){
-    const area = document.getElementById('play-area');
-    area.innerHTML = '';
-    const h = document.createElement('h2'); h.innerText = 'Finde die Paare'; area.appendChild(h);
-    const grid = document.createElement('div'); grid.className = 'memory-grid';
-
-    memoryState.cards.forEach((card, i)=>{
-        const c = document.createElement('div'); c.className = 'card';
-        if(card.flipped) c.classList.add('flipped');
-        c.innerText = card.flipped ? card.val : '';
-        c.onclick = ()=>{ memoryFlip(i); };
-        grid.appendChild(c);
+function updateDateTime() {
+    const now = new Date();
+    document.getElementById("todayDate").textContent = now.toLocaleDateString("de-DE", {
+        weekday: "long",
+        day: "2-digit",
+        month: "long",
+        year: "numeric"
     });
-    area.appendChild(grid);
+
+    document.getElementById("todayTime").textContent = now.toLocaleTimeString("de-DE", {
+        hour: "2-digit",
+        minute: "2-digit"
+    });
 }
 
-function memoryFlip(i){
-    const card = memoryState.cards[i];
-    if(card.flipped) return;
-    card.flipped = true; renderMemory();
-    if(memoryState.first === null){
-        memoryState.first = i;
+setInterval(updateDateTime, 1000);
+updateDateTime();
+
+function saveBudget() {
+    const value = parseFloat(document.getElementById("budgetInput").value);
+
+    if (isNaN(value) || value < 0) {
+        alert("Bitte gib ein gültiges Budget ein.");
+        return;
+    }
+
+    monthlyBudget = value;
+    localStorage.setItem("monthlyBudget", monthlyBudget);
+    document.getElementById("budgetInput").value = "";
+    refreshAll();
+}
+
+function addExpense() {
+    const name = document.getElementById("expenseName").value.trim();
+    const amount = parseFloat(document.getElementById("expenseAmount").value);
+    const category = document.getElementById("expenseCategory").value;
+
+    if (!name || isNaN(amount) || amount <= 0) {
+        alert("Bitte Beschreibung und Betrag eingeben.");
+        return;
+    }
+
+    expenses.unshift({
+        id: Date.now(),
+        name,
+        amount,
+        category,
+        date: new Date().toISOString()
+    });
+
+    localStorage.setItem("expenses", JSON.stringify(expenses));
+
+    document.getElementById("expenseName").value = "";
+    document.getElementById("expenseAmount").value = "";
+
+    refreshAll();
+}
+
+function deleteExpense(id) {
+    expenses = expenses.filter(expense => expense.id !== id);
+    localStorage.setItem("expenses", JSON.stringify(expenses));
+    refreshAll();
+}
+
+function addShoppingItem() {
+    const input = document.getElementById("shoppingInput");
+    const value = input.value.trim();
+
+    if (!value) return;
+
+    shoppingItems.push({
+        id: Date.now(),
+        name: value,
+        done: false
+    });
+
+    localStorage.setItem("shoppingItems", JSON.stringify(shoppingItems));
+    input.value = "";
+    refreshAll();
+}
+
+function toggleShoppingItem(id) {
+    shoppingItems = shoppingItems.map(item => {
+        if (item.id === id) item.done = !item.done;
+        return item;
+    });
+
+    localStorage.setItem("shoppingItems", JSON.stringify(shoppingItems));
+    refreshAll();
+}
+
+function deleteShoppingItem(id) {
+    shoppingItems = shoppingItems.filter(item => item.id !== id);
+    localStorage.setItem("shoppingItems", JSON.stringify(shoppingItems));
+    refreshAll();
+}
+
+function getCurrentMonthExpenses() {
+    const now = new Date();
+    return expenses.filter(expense => {
+        const d = new Date(expense.date);
+        return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+    });
+}
+
+function refreshOverview() {
+    const monthExpenses = getCurrentMonthExpenses();
+    const spent = monthExpenses.reduce((sum, e) => sum + Number(e.amount), 0);
+    const left = monthlyBudget - spent;
+    const percent = monthlyBudget > 0 ? Math.min((spent / monthlyBudget) * 100, 100) : 0;
+
+    document.getElementById("overviewBudget").textContent = formatEuro(monthlyBudget);
+    document.getElementById("overviewSpent").textContent = formatEuro(spent);
+    document.getElementById("overviewLeft").textContent = formatEuro(left);
+    document.getElementById("overviewShopping").textContent = shoppingItems.filter(i => !i.done).length;
+
+    const progress = document.getElementById("budgetProgress");
+    progress.style.width = percent + "%";
+
+    if (percent < 70) progress.style.background = "var(--green)";
+    else if (percent < 90) progress.style.background = "var(--yellow)";
+    else progress.style.background = "var(--red)";
+
+    if (monthlyBudget <= 0) {
+        document.getElementById("budgetHint").textContent = "Noch kein Monatsbudget gesetzt.";
     } else {
-        const firstCard = memoryState.cards[memoryState.first];
-        if(firstCard.val === card.val){
-            // match
-            memoryState.matched += 1;
-            currentScore += 1; // one point per pair
-            document.getElementById('score').innerText = currentScore;
-            memoryState.first = null;
-            if(memoryState.matched >= 6){
-                // all found, reshuffle to continue
-                setTimeout(()=>{
-                    startMemory();
-                }, 800);
-            }
-        } else {
-            // no match -> flip back after short delay
-            setTimeout(()=>{
-                memoryState.cards[i].flipped = false;
-                memoryState.cards[memoryState.first].flipped = false;
-                memoryState.first = null;
-                renderMemory();
-            }, 700);
-        }
+        document.getElementById("budgetHint").textContent =
+            `${percent.toFixed(1)}% deines Budgets wurden diesen Monat genutzt.`;
+    }
+
+    const recent = document.getElementById("recentExpenses");
+    recent.innerHTML = "";
+
+    expenses.slice(0, 5).forEach(expense => {
+        const div = document.createElement("div");
+        div.className = "list-item";
+        div.innerHTML = `
+            <div>
+                <strong>${expense.name}</strong><br>
+                <span class="muted">${expense.category}</span>
+            </div>
+            <strong>${formatEuro(expense.amount)}</strong>
+        `;
+        recent.appendChild(div);
+    });
+
+    if (expenses.length === 0) {
+        recent.innerHTML = `<p class="muted">Noch keine Ausgaben erfasst.</p>`;
+    }
+
+    const overviewShopping = document.getElementById("overviewShoppingList");
+    overviewShopping.innerHTML = "";
+
+    shoppingItems.filter(i => !i.done).slice(0, 6).forEach(item => {
+        const div = document.createElement("div");
+        div.className = "list-item";
+        div.innerHTML = `<span>${item.name}</span><span class="badge">offen</span>`;
+        overviewShopping.appendChild(div);
+    });
+
+    if (shoppingItems.filter(i => !i.done).length === 0) {
+        overviewShopping.innerHTML = `<p class="muted">Keine offenen Einkäufe.</p>`;
     }
 }
 
-/* ------------------ MATHE-Flash ------------------ */
-let currentAnswerInput = null;
-let mathProblemIndex = 0;
+function refreshExpenses() {
+    const list = document.getElementById("expenseList");
+    list.innerHTML = "";
 
-function startMath(){
-    currentScore = 0;
-    mathProblemIndex = 0;
-    renderMathProblem();
+    expenses.forEach(expense => {
+        const date = new Date(expense.date).toLocaleDateString("de-DE");
+
+        const div = document.createElement("div");
+        div.className = "list-item";
+        div.innerHTML = `
+            <div>
+                <strong>${expense.name}</strong><br>
+                <span class="muted">${date} · ${expense.category}</span>
+            </div>
+            <div>
+                <strong>${formatEuro(expense.amount)}</strong>
+                <button class="danger" onclick="deleteExpense(${expense.id})">Löschen</button>
+            </div>
+        `;
+        list.appendChild(div);
+    });
+
+    if (expenses.length === 0) {
+        list.innerHTML = `<p class="muted">Noch keine Ausgaben vorhanden.</p>`;
+    }
+
+    refreshCategories();
 }
 
-function randInt(min,max){ return Math.floor(Math.random()*(max-min+1))+min }
+function refreshCategories() {
+    const summary = {};
+    getCurrentMonthExpenses().forEach(expense => {
+        summary[expense.category] = (summary[expense.category] || 0) + Number(expense.amount);
+    });
 
-function renderMathProblem(){
-    const area = document.getElementById('play-area');
-    area.innerHTML = '';
-    const a = randInt(1,20);
-    const b = randInt(1,20);
-    const ops = ['+','-','*'];
-    const op = ops[randInt(0,ops.length-1)];
-    let correct;
-    if(op === '+') correct = a+b;
-    if(op === '-') correct = a-b;
-    if(op === '*') correct = a*b;
-    const h = document.createElement('h2'); h.innerText = `Was ist ${a} ${op} ${b} ?`;
-    area.appendChild(h);
-    const form = document.createElement('div');
-    const input = document.createElement('input'); input.type='number'; input.style.padding='8px'; input.style.fontSize='16px'; input.id='math-input';
-    const sub = document.createElement('button'); sub.className='game-btn'; sub.innerText='Antwort prüfen';
-    sub.onclick = ()=>{
-        const val = parseInt(input.value,10);
-        if(!isNaN(val) && val === correct){ currentScore++; document.getElementById('score').innerText = currentScore; }
-        input.value = '';
-        renderMathProblem();
-    };
-    form.appendChild(input); form.appendChild(sub);
-    area.appendChild(form);
-    // allow Enter
-    input.addEventListener('keydown', (e)=>{ if(e.key === 'Enter') sub.onclick(); });
+    const container = document.getElementById("categorySummary");
+    container.innerHTML = "";
+
+    Object.keys(summary).forEach(category => {
+        const div = document.createElement("div");
+        div.className = "category-row";
+        div.innerHTML = `
+            <span>${category}</span>
+            <strong>${formatEuro(summary[category])}</strong>
+        `;
+        container.appendChild(div);
+    });
+
+    if (Object.keys(summary).length === 0) {
+        container.innerHTML = `<p class="muted">Noch keine Kategorien diesen Monat.</p>`;
+    }
 }
 
-/* ------------------ LEBENSZYKLUS ------------------ */
-// show menu at load
-showMenu();
-loadHighscores();
+function refreshShopping() {
+    const list = document.getElementById("shoppingList");
+    list.innerHTML = "";
 
+    shoppingItems.forEach(item => {
+        const div = document.createElement("div");
+        div.className = "list-item";
+        div.innerHTML = `
+            <div>
+                <input type="checkbox" ${item.done ? "checked" : ""} onchange="toggleShoppingItem(${item.id})" style="width:auto; margin-right:8px;">
+                <span style="${item.done ? "text-decoration:line-through; color:#94a3b8;" : ""}">
+                    ${item.name}
+                </span>
+            </div>
+            <button class="danger" onclick="deleteShoppingItem(${item.id})">Löschen</button>
+        `;
+        list.appendChild(div);
+    });
+
+    if (shoppingItems.length === 0) {
+        list.innerHTML = `<p class="muted">Deine Einkaufsliste ist leer.</p>`;
+    }
+}
+
+function saveCalendarLink() {
+    let link = document.getElementById("calendarLinkInput").value.trim();
+
+    if (!link) {
+        alert("Bitte Kalender-Link einfügen.");
+        return;
+    }
+
+    if (link.includes("([^ {
+                    if (m.status) {
+                        status.textContent = "Status: " + m.status;
+                    }
+                }
+            }
+        );
+
+        const text = result.data.text;
+        textBox.textContent = text || "Kein Text erkannt.";
+
+        const amounts = extractAmounts(text);
+        showDetectedAmounts(amounts);
+
+        status.textContent = "Fertig. Bitte erkannte Beträge prüfen.";
+    } catch (error) {
+        console.error(error);
+        status.textContent = "Fehler beim Auslesen des Belegs.";
+        textBox.textContent = "OCR konnte nicht ausgeführt werden.";
+    }
+}
+
+function extractAmounts(text) {
+    const matches = text.match(/\d{1,3}[,.]\d{2}/g) || [];
+
+    const amounts = matches
+        .map(value => parseFloat(value.replace(",", ".")))
+        .filter(value => value > 0 && value < 1000);
+
+    return [...new Set(amounts)];
+}
+
+function showDetectedAmounts(amounts) {
+    const box = document.getElementById("detectedAmounts");
+    box.innerHTML = "";
+
+    if (amounts.length === 0) {
+        box.innerHTML = `<p class="muted">Keine Beträge erkannt.</p>`;
+        return;
+    }
+
+    amounts.forEach(amount => {
+        const div = document.createElement("div");
+        div.className = "list-item";
+        div.innerHTML = `
+            <div>
+                <strong>${formatEuro(amount)}</strong><br>
+                <span class="muted">Erkannter Betrag vom Beleg</span>
+            </div>
+            <button class="primary" onclick="addDetectedExpense(${amount})">Als Ausgabe speichern</button>
+        `;
+        box.appendChild(div);
+    });
+}
+
+function addDetectedExpense(amount) {
+    const name = prompt("Beschreibung der Ausgabe:", "Einkauf per Beleg");
+
+    if (!name) return;
+
+    expenses.unshift({
+        id: Date.now(),
+        name,
+        amount,
+        category: "Lebensmittel",
+        date: new Date().toISOString()
+    });
+
+    localStorage.setItem("expenses", JSON.stringify(expenses));
+    refreshAll();
+    alert("Ausgabe gespeichert.");
+}
+
+function refreshAll() {
+    refreshOverview();
+    refreshExpenses();
+    refreshShopping();
+    loadCalendar();
+    loadNotes();
+}
+
+refreshAll();
 </script>
 
 </body>
