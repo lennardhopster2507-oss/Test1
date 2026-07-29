@@ -250,6 +250,57 @@ button.danger {
     padding: 8px 0;
 }
 
+/* --- Spielebereich Styles --- */
+.games-menu {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+}
+.game-button {
+    padding: 8px 12px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: rgba(255,255,255,0.03);
+    color: var(--text);
+    cursor: pointer;
+}
+.game-button.active {
+    background: var(--yellow);
+    color: #04212a;
+    font-weight: bold;
+}
+.game-area {
+    min-height: 240px;
+}
+.ttt-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    max-width: 300px;
+}
+.ttt-cell {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    padding: 18px;
+    text-align: center;
+    font-size: 36px;
+    cursor: pointer;
+    border-radius: 10px;
+}
+.reaction-box {
+    height: 140px;
+    border-radius: 12px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:20px;
+    cursor:pointer;
+    user-select:none;
+}
+.center {
+    text-align:center;
+}
 footer {
     margin-top: 30px;
     text-align: center;
@@ -296,6 +347,7 @@ footer {
     <button onclick="showSection('receipts', this)">Belege scannen</button>
     <button onclick="showSection('calendar', this)">Kalender</button>
     <button onclick="showSection('notes', this)">Notizen</button>
+    <button onclick="showSection('games', this)">Spielebereich Alina</button>
 </nav>
 
 <section id="overview" class="section active">
@@ -489,6 +541,33 @@ footer {
     </div>
 </section>
 
+<!-- Neue Sektion: Spielebereich Alina -->
+<section id="games" class="section">
+    <div class="grid">
+        <div class="card col-4">
+            <h2>Spielebereich Alina</h2>
+            <p class="muted">Kleine und witzige Minispiele zur Auflockerung. Wähle ein Spiel und leg los!</p>
+
+            <div class="games-menu" id="gamesMenu">
+                <button class="game-button active" onclick="showGame('ttt', this)">Tic-Tac-Toe</button>
+                <button class="game-button" onclick="showGame('reaction', this)">Reaktionstest</button>
+                <button class="game-button" onclick="showGame('click', this)">Klick-Rennen</button>
+                <button class="game-button" onclick="showGame('rps', this)">Schere/Stein/Papier</button>
+            </div>
+
+            <p class="muted">Viel Spaß! Die Spiele sind lokal und speichern nichts.</p>
+        </div>
+
+        <div class="card col-8">
+            <h2 id="gameTitle">Tic-Tac-Toe</h2>
+            <div id="gameArea" class="game-area">
+                <!-- Inhalt wird per JS eingefügt -->
+            </div>
+            <div id="gameFooter" class="muted" style="margin-top:12px;"></div>
+        </div>
+    </div>
+</section>
+
 <footer>
     Persönliches Dashboard. Daten werden lokal im Browser gespeichert.
 </footer>
@@ -532,6 +611,7 @@ function sectionName(id) {
     if (id === "receipts") return "belege";
     if (id === "calendar") return "kalender";
     if (id === "notes") return "notizen";
+    if (id === "games") return "spiele";
     return "übersicht";
 }
 
@@ -918,6 +998,241 @@ function refreshAll() {
     loadCalendar();
     loadNotes();
 }
+
+/* ----------------- Spielebereich JS ----------------- */
+
+let currentGame = 'ttt';
+let tttState = Array(9).fill(null);
+let tttTurn = 'X';
+
+function showGame(gameId, btn) {
+    currentGame = gameId;
+    document.querySelectorAll('.game-button').forEach(b => b.classList.remove('active'));
+    if (btn) btn.classList.add('active');
+
+    const title = {
+        ttt: 'Tic-Tac-Toe',
+        reaction: 'Reaktionstest',
+        click: 'Klick-Rennen',
+        rps: 'Schere / Stein / Papier'
+    }[gameId] || 'Spiel';
+
+    document.getElementById('gameTitle').textContent = title;
+    document.getElementById('gameFooter').textContent = '';
+
+    const area = document.getElementById('gameArea');
+    area.innerHTML = '';
+
+    if (gameId === 'ttt') renderTTT(area);
+    if (gameId === 'reaction') renderReaction(area);
+    if (gameId === 'click') renderClickRace(area);
+    if (gameId === 'rps') renderRPS(area);
+}
+
+function renderTTT(container) {
+    tttState = Array(9).fill(null);
+    tttTurn = 'X';
+    const board = document.createElement('div');
+    board.className = 'ttt-grid';
+    for (let i = 0; i < 9; i++) {
+        const cell = document.createElement('div');
+        cell.className = 'ttt-cell';
+        cell.dataset.idx = i;
+        cell.addEventListener('click', () => {
+            if (tttState[i] || checkWinner(tttState)) return;
+            tttState[i] = tttTurn;
+            tttTurn = tttTurn === 'X' ? 'O' : 'X';
+            updateTTT(board);
+            const winner = checkWinner(tttState);
+            if (winner) {
+                document.getElementById('gameFooter').textContent = `Spiel beendet — Gewinner: ${winner}`;
+            } else if (tttState.every(Boolean)) {
+                document.getElementById('gameFooter').textContent = 'Unentschieden!';
+            }
+        });
+        board.appendChild(cell);
+    }
+    const reset = document.createElement('button');
+    reset.className = 'primary';
+    reset.style.marginTop = '12px';
+    reset.textContent = 'Neu starten';
+    reset.addEventListener('click', () => renderTTT(container));
+    container.appendChild(board);
+    container.appendChild(reset);
+    updateTTT(board);
+}
+
+function updateTTT(board) {
+    for (let i = 0; i < 9; i++) {
+        board.children[i].textContent = tttState[i] || '';
+    }
+}
+
+function checkWinner(board) {
+    const lines = [
+        [0,1,2],[3,4,5],[6,7,8],
+        [0,3,6],[1,4,7],[2,5,8],
+        [0,4,8],[2,4,6]
+    ];
+    for (const [a,b,c] of lines) {
+        if (board[a] && board[a] === board[b] && board[a] === board[c]) return board[a];
+    }
+    return null;
+}
+
+/* Reaktionstest */
+let reactionTimeout = null;
+let reactionStart = null;
+function renderReaction(container) {
+    container.innerHTML = '';
+    const box = document.createElement('div');
+    box.className = 'reaction-box';
+    box.style.background = 'rgba(255,255,255,0.03)';
+    box.textContent = 'Klick um vorzubereiten';
+    container.appendChild(box);
+
+    box.addEventListener('click', () => {
+        if (reactionTimeout) {
+            // während Wartezeit: false click
+            const diff = Date.now() - reactionStart;
+            if (reactionStart) {
+                document.getElementById('gameFooter').textContent = `Zu früh geklickt! (${diff}ms) Versuch nochmal.`;
+            }
+            clearTimeout(reactionTimeout);
+            reactionTimeout = null;
+            reactionStart = null;
+            box.style.background = 'rgba(255,255,255,0.03)';
+            box.textContent = 'Klick um vorzubereiten';
+            return;
+        }
+
+        box.textContent = 'Warte auf Grün...';
+        box.style.background = 'orange';
+        document.getElementById('gameFooter').textContent = '';
+        const delay = 1000 + Math.random() * 2500;
+        reactionTimeout = setTimeout(() => {
+            box.style.background = 'var(--green)';
+            box.textContent = 'JETZT!';
+            reactionStart = Date.now();
+            // set listener for actual reaction
+            const clickHandler = () => {
+                const rt = Date.now() - reactionStart;
+                document.getElementById('gameFooter').textContent = `Reaktionszeit: ${rt} ms — nicht schlecht!`;
+                box.removeEventListener('click', clickHandler);
+                reactionTimeout = null;
+                reactionStart = null;
+                box.style.background = 'rgba(255,255,255,0.03)';
+                box.textContent = 'Klick um vorzubereiten';
+            };
+            box.addEventListener('click', clickHandler, { once: true });
+        }, delay);
+    });
+}
+
+/* Klick-Rennen */
+let clickCounter = 0;
+let clickTimer = null;
+function renderClickRace(container) {
+    container.innerHTML = '';
+    const info = document.createElement('div');
+    info.className = 'center muted';
+    info.textContent = 'Klicke so oft du kannst in 5 Sekunden!';
+    const btn = document.createElement('button');
+    btn.className = 'primary';
+    btn.textContent = 'KLICK!';
+    btn.style.fontSize = '22px';
+    btn.style.padding = '18px 28px';
+    btn.disabled = true;
+
+    const start = document.createElement('button');
+    start.className = 'secondary';
+    start.textContent = 'Start (5s)';
+    start.addEventListener('click', () => {
+        clickCounter = 0;
+        btn.disabled = false;
+        btn.textContent = 'KLICK!';
+        document.getElementById('gameFooter').textContent = 'Viel Erfolg!';
+        let remaining = 5;
+        start.disabled = true;
+        clickTimer = setInterval(() => {
+            remaining--;
+            if (remaining <= 0) {
+                clearInterval(clickTimer);
+                clickTimer = null;
+                btn.disabled = true;
+                start.disabled = false;
+                document.getElementById('gameFooter').textContent = `Fertig! Deine Klicks: ${clickCounter}`;
+            }
+        }, 1000);
+        setTimeout(() => {
+            // ensure timer end
+            if (clickTimer) {
+                clearInterval(clickTimer);
+                clickTimer = null;
+                btn.disabled = true;
+                start.disabled = false;
+                document.getElementById('gameFooter').textContent = `Fertig! Deine Klicks: ${clickCounter}`;
+            }
+        }, 5000);
+    });
+
+    btn.addEventListener('click', () => {
+        clickCounter++;
+        btn.textContent = `Klicks: ${clickCounter}`;
+    });
+
+    container.appendChild(info);
+    container.appendChild(btn);
+    container.appendChild(document.createElement('br'));
+    container.appendChild(document.createElement('br'));
+    container.appendChild(start);
+}
+
+/* Schere / Stein / Papier */
+function renderRPS(container) {
+    container.innerHTML = '';
+    const info = document.createElement('div');
+    info.className = 'muted';
+    info.textContent = 'Wähle: Schere, Stein oder Papier. Gewinnt das bessere Element!';
+    const opts = ['Schere', 'Stein', 'Papier'];
+    const btnRow = document.createElement('div');
+    btnRow.style.display = 'flex';
+    btnRow.style.gap = '8px';
+    btnRow.style.marginTop = '8px';
+
+    opts.forEach(opt => {
+        const b = document.createElement('button');
+        b.className = 'primary';
+        b.textContent = opt;
+        b.addEventListener('click', () => {
+            const comp = opts[Math.floor(Math.random() * 3)];
+            const result = rpsResult(opt, comp);
+            document.getElementById('gameFooter').textContent = `Du: ${opt} · Gegner: ${comp} → ${result}`;
+        });
+        btnRow.appendChild(b);
+    });
+
+    container.appendChild(info);
+    container.appendChild(btnRow);
+}
+
+function rpsResult(user, comp) {
+    if (user === comp) return 'Unentschieden';
+    if (
+        (user === 'Schere' && comp === 'Papier') ||
+        (user === 'Papier' && comp === 'Stein') ||
+        (user === 'Stein' && comp === 'Schere')
+    ) return 'Du gewinnst 🎉';
+    return 'Du verlierst 😅';
+}
+
+/* --- init Spielebereich default --- */
+document.addEventListener('DOMContentLoaded', () => {
+    // default Spiel rendern
+    showGame('ttt');
+});
+
+/* ----------------- Ende Spielebereich JS ----------------- */
 
 refreshAll();
 </script>
