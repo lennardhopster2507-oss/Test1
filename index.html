@@ -3,28 +3,58 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Emsland Quiz</title>
+<title>Emsland Spielezentrum</title>
 
 <style>
 body {
     font-family: Arial, sans-serif;
-    max-width: 700px;
-    margin: 50px auto;
+    max-width: 900px;
+    margin: 30px auto;
     text-align: center;
     background: #f4f4f4;
+    padding: 10px;
 }
 
-#quiz-container {
+#app-container {
     background: white;
     padding: 20px;
     border-radius: 10px;
 }
 
-button {
+header {
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap: 10px;
+}
+
+nav {
+    margin: 20px 0;
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    justify-content:center;
+}
+
+.game-btn {
+    padding: 12px 18px;
+    cursor: pointer;
+    border: none;
+    background: #0078D4;
+    color: white;
+    border-radius: 6px;
+    font-size: 15px;
+}
+
+.game-btn:hover { background:#005ea2 }
+
+#game-area { margin-top: 10px }
+
+button.answer {
     display: block;
     width: 100%;
-    margin: 10px 0;
-    padding: 15px;
+    margin: 8px 0;
+    padding: 12px;
     cursor: pointer;
     border: none;
     background: #0078D4;
@@ -33,31 +63,193 @@ button {
     font-size: 16px;
 }
 
-button:hover {
-    background: #005ea2;
+button.answer:hover { background:#005ea2 }
+
+#result { font-size: 20px; margin-top: 12px; font-weight: bold }
+
+#topbar { display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:10px }
+
+#timer, #score, #highscore { font-weight: bold }
+
+.memory-grid { display:grid; grid-template-columns: repeat(4, 1fr); gap:10px; margin: 12px 0 }
+
+.card {
+    background:#0078D4; color:white; padding:18px; border-radius:8px; font-size:18px; cursor:pointer; user-select:none;
+    display:flex; align-items:center; justify-content:center; height:70px;
 }
 
-#result {
-    font-size: 24px;
-    margin-top: 20px;
-    font-weight: bold;
+.card.flipped { background:#e0e0e0; color:#111 }
+
+.big-button {
+    padding: 30px 20px; font-size: 30px; border-radius: 12px; background: #0078D4; color: white; border:none; cursor:pointer;
 }
+
+.small { font-size: 14px }
+
+footer { margin-top: 18px; font-size:13px; color:#666 }
+
 </style>
 </head>
 <body>
 
-<div id="quiz-container">
-    <h1>Emsland Quiz</h1>
+<div id="app-container">
+    <header>
+        <h1>Emsland Spielezentrum</h1>
+        <div class="small">Spieldauer pro Spiel: 5 Minuten</div>
+    </header>
 
-    <h2 id="question"></h2>
+    <nav>
+        <button class="game-btn" onclick="showMenu()">Menü</button>
+        <button class="game-btn" onclick="startGame('quiz')">Quiz</button>
+        <button class="game-btn" onclick="startGame('clicker')">Schnellklick</button>
+        <button class="game-btn" onclick="startGame('memory')">Memory</button>
+        <button class="game-btn" onclick="startGame('math')">Mathe-Flash</button>
+    </nav>
 
-    <div id="answers"></div>
+    <div id="game-area">
+        <div id="menu">
+            <h2>Wähle ein Spiel</h2>
+            <p>4 Spiele, jeweils ca. 5 Minuten: Quiz, Schnellklick, Memory, Mathe-Flash. Jeder Modus speichert deinen persönlichen Highscore lokal im Browser.</p>
+            <div style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
+                <div style="min-width:200px; text-align:left; padding:10px; border-radius:8px; background:#fafafa;"> 
+                    <h3>Quiz</h3>
+                    <p>Mehrere Auswahlfragen rund ums Emsland. Punkte für richtige Antworten.</p>
+                    <div>Highscore: <span id="hs-quiz">0</span></div>
+                </div>
+                <div style="min-width:200px; text-align:left; padding:10px; border-radius:8px; background:#fafafa;"> 
+                    <h3>Schnellklick</h3>
+                    <p>Klicke so oft du kannst in 5 Minuten.</p>
+                    <div>Highscore: <span id="hs-clicker">0</span></div>
+                </div>
+                <div style="min-width:200px; text-align:left; padding:10px; border-radius:8px; background:#fafafa;"> 
+                    <h3>Memory</h3>
+                    <p>Paare finden. 12 Karten (6 Paare).</p>
+                    <div>Highscore: <span id="hs-memory">0</span></div>
+                </div>
+                <div style="min-width:200px; text-align:left; padding:10px; border-radius:8px; background:#fafafa;"> 
+                    <h3>Mathe-Flash</h3>
+                    <p>Schnelle Rechenaufgaben — so viele richtig wie möglich in 5 Minuten.</p>
+                    <div>Highscore: <span id="hs-math">0</span></div>
+                </div>
+            </div>
+        </div>
 
-    <div id="result"></div>
+        <div id="game" style="display:none; text-align:left;">
+            <div id="topbar">
+                <div>Spiel: <span id="game-title">-</span></div>
+                <div>Zeit: <span id="timer">05:00</span></div>
+                <div>Score: <span id="score">0</span></div>
+                <div>Highscore: <span id="highscore">0</span></div>
+                <div><button class="game-btn" onclick="endEarly()">Beenden</button></div>
+            </div>
+
+            <div id="play-area"></div>
+
+            <div id="result"></div>
+        </div>
+    </div>
+
+    <footer>
+        <p>Deine Highscores werden nur lokal in diesem Browser gespeichert (localStorage).</p>
+    </footer>
 </div>
 
 <script>
-const quiz = [
+// Allgemeine Einstellungen
+const GAME_DURATION = 5 * 60; // 5 Minuten in Sekunden
+let timerInterval = null;
+let remainingSeconds = GAME_DURATION;
+let currentGame = null;
+let currentScore = 0;
+
+function formatTime(s){
+    const m = Math.floor(s/60).toString().padStart(2,'0');
+    const sec = (s%60).toString().padStart(2,'0');
+    return `${m}:${sec}`;
+}
+
+function loadHighscores(){
+    document.getElementById('hs-quiz').innerText = localStorage.getItem('hs_quiz') || 0;
+    document.getElementById('hs-clicker').innerText = localStorage.getItem('hs_clicker') || 0;
+    document.getElementById('hs-memory').innerText = localStorage.getItem('hs_memory') || 0;
+    document.getElementById('hs-math').innerText = localStorage.getItem('hs_math') || 0;
+}
+
+function showMenu(){
+    stopTimer();
+    document.getElementById('menu').style.display = '';
+    document.getElementById('game').style.display = 'none';
+    currentGame = null;
+    document.getElementById('result').innerText = '';
+    loadHighscores();
+}
+
+function startGame(id){
+    // reset
+    stopTimer();
+    currentGame = id;
+    remainingSeconds = GAME_DURATION;
+    currentScore = 0;
+    document.getElementById('menu').style.display = 'none';
+    document.getElementById('game').style.display = '';
+    document.getElementById('game-title').innerText = gameTitle(id);
+    document.getElementById('timer').innerText = formatTime(remainingSeconds);
+    document.getElementById('score').innerText = currentScore;
+    document.getElementById('highscore').innerText = localStorage.getItem('hs_' + id) || 0;
+    document.getElementById('result').innerText = '';
+
+    // start timer
+    timerInterval = setInterval(() =>{
+        remainingSeconds--;
+        document.getElementById('timer').innerText = formatTime(remainingSeconds);
+        if(remainingSeconds <= 0){
+            stopTimer();
+            finishGame();
+        }
+    }, 1000);
+
+    // start specific game
+    if(id === 'quiz') startQuiz();
+    if(id === 'clicker') startClicker();
+    if(id === 'memory') startMemory();
+    if(id === 'math') startMath();
+}
+
+function stopTimer(){
+    if(timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+}
+
+function endEarly(){
+    // confirm
+    if(confirm('Willst du das Spiel vorzeitig beenden?')){
+        stopTimer();
+        finishGame();
+    }
+}
+
+function finishGame(){
+    // show result and save highscore
+    document.getElementById('result').innerText = `Spiel beendet! Dein Ergebnis: ${currentScore}`;
+    const key = 'hs_' + currentGame;
+    const prev = parseInt(localStorage.getItem(key) || '0', 10);
+    if(currentScore > prev){
+        localStorage.setItem(key, currentScore);
+        document.getElementById('result').innerText += '\nNeuer Highscore!';
+    }
+    loadHighscores();
+}
+
+function gameTitle(id){
+    switch(id){
+        case 'quiz': return 'Quiz';
+        case 'clicker': return 'Schnellklick';
+        case 'memory': return 'Memory';
+        case 'math': return 'Mathe-Flash';
+    }
+}
+
+/* ------------------ QUIZ ------------------ */
+const quizQuestions = [
 {
     question: "Welche Stadt ist die größte im Emsland?",
     answers: ["Lingen", "Meppen", "Papenburg", "Haselünne"],
@@ -82,51 +274,183 @@ const quiz = [
     question: "In welcher Stadt befindet sich die Hochschule Osnabrück Campus Lingen?",
     answers: ["Meppen", "Papenburg", "Lingen", "Sögel"],
     correct: 2
+},
+// zusätzliche Fragen für etwas Variation
+{
+    question: "Welcher Landkreis grenzt nicht an das Emsland?",
+    answers: ["Grafschaft Bentheim", "Emsigerland", "Osnabrück", "Cloppenburg"],
+    correct: 1
+},
+{
+    question: "Welche Industrie ist in Papenburg besonders wichtig?",
+    answers: ["Schiffbau", "Automobilbau", "Textil", "Elektronik"],
+    correct: 0
 }
 ];
 
-let currentQuestion = 0;
-let score = 0;
+let quizOrder = [];
+let quizIndex = 0;
 
-function showQuestion() {
-    const q = quiz[currentQuestion];
+function startQuiz(){
+    // prepare: shuffle order
+    quizOrder = quizQuestions.map((_,i)=>i).sort(()=>Math.random()-0.5);
+    quizIndex = 0;
+    currentScore = 0;
+    renderQuizQuestion();
+}
 
-    document.getElementById("question").innerText = q.question;
+function renderQuizQuestion(){
+    const area = document.getElementById('play-area');
+    area.innerHTML = '';
+    if(quizIndex >= quizOrder.length){
+        // reshuffle and continue within time
+        quizOrder = quizQuestions.map((_,i)=>i).sort(()=>Math.random()-0.5);
+        quizIndex = 0;
+    }
+    const q = quizQuestions[quizOrder[quizIndex]];
+    const h = document.createElement('h2'); h.innerText = q.question; area.appendChild(h);
 
-    const answersDiv = document.getElementById("answers");
-    answersDiv.innerHTML = "";
-
-    q.answers.forEach((answer, index) => {
-        const btn = document.createElement("button");
-        btn.innerText = answer;
-
-        btn.onclick = () => {
-            if(index === q.correct){
-                score++;
-            }
-
-            currentQuestion++;
-
-            if(currentQuestion < quiz.length){
-                showQuestion();
-            } else {
-                showResult();
-            }
+    const answersDiv = document.createElement('div');
+    q.answers.forEach((a,i)=>{
+        const btn = document.createElement('button');
+        btn.className = 'answer';
+        btn.innerText = a;
+        btn.onclick = ()=>{
+            if(i === q.correct){ currentScore++; document.getElementById('score').innerText = currentScore; }
+            quizIndex++;
+            renderQuizQuestion();
         };
-
         answersDiv.appendChild(btn);
     });
+    area.appendChild(answersDiv);
 }
 
-function showResult(){
-    document.getElementById("question").innerText = "Quiz beendet!";
-    document.getElementById("answers").innerHTML = "";
-
-    document.getElementById("result").innerHTML =
-        `Du hast ${score} von ${quiz.length} Fragen richtig beantwortet.`;
+/* ------------------ CLICKER ------------------ */
+let clickCount = 0;
+function startClicker(){
+    clickCount = 0;
+    currentScore = 0;
+    const area = document.getElementById('play-area');
+    area.innerHTML = '';
+    const info = document.createElement('div'); info.innerHTML = '<h2>Klicke so oft du kannst!</h2>';
+    area.appendChild(info);
+    const btn = document.createElement('button');
+    btn.className = 'big-button'; btn.innerText = 'KLICK';
+    btn.onclick = ()=>{ clickCount++; currentScore = clickCount; document.getElementById('score').innerText = currentScore; }
+    area.appendChild(btn);
 }
 
-showQuestion();
+/* ------------------ MEMORY ------------------ */
+let memoryState = {
+    cards: [],
+    first: null,
+    matched: 0
+};
+
+function startMemory(){
+    // create 6 pairs (12 cards)
+    const symbols = ['A','B','C','D','E','F'];
+    const pool = symbols.concat(symbols).sort(()=>Math.random()-0.5);
+    memoryState.cards = pool.map((val, idx)=>({val, idx, flipped:false}));
+    memoryState.first = null;
+    memoryState.matched = 0;
+    currentScore = 0;
+    renderMemory();
+}
+
+function renderMemory(){
+    const area = document.getElementById('play-area');
+    area.innerHTML = '';
+    const h = document.createElement('h2'); h.innerText = 'Finde die Paare'; area.appendChild(h);
+    const grid = document.createElement('div'); grid.className = 'memory-grid';
+
+    memoryState.cards.forEach((card, i)=>{
+        const c = document.createElement('div'); c.className = 'card';
+        if(card.flipped) c.classList.add('flipped');
+        c.innerText = card.flipped ? card.val : '';
+        c.onclick = ()=>{ memoryFlip(i); };
+        grid.appendChild(c);
+    });
+    area.appendChild(grid);
+}
+
+function memoryFlip(i){
+    const card = memoryState.cards[i];
+    if(card.flipped) return;
+    card.flipped = true; renderMemory();
+    if(memoryState.first === null){
+        memoryState.first = i;
+    } else {
+        const firstCard = memoryState.cards[memoryState.first];
+        if(firstCard.val === card.val){
+            // match
+            memoryState.matched += 1;
+            currentScore += 1; // one point per pair
+            document.getElementById('score').innerText = currentScore;
+            memoryState.first = null;
+            if(memoryState.matched >= 6){
+                // all found, reshuffle to continue
+                setTimeout(()=>{
+                    startMemory();
+                }, 800);
+            }
+        } else {
+            // no match -> flip back after short delay
+            setTimeout(()=>{
+                memoryState.cards[i].flipped = false;
+                memoryState.cards[memoryState.first].flipped = false;
+                memoryState.first = null;
+                renderMemory();
+            }, 700);
+        }
+    }
+}
+
+/* ------------------ MATHE-Flash ------------------ */
+let currentAnswerInput = null;
+let mathProblemIndex = 0;
+
+function startMath(){
+    currentScore = 0;
+    mathProblemIndex = 0;
+    renderMathProblem();
+}
+
+function randInt(min,max){ return Math.floor(Math.random()*(max-min+1))+min }
+
+function renderMathProblem(){
+    const area = document.getElementById('play-area');
+    area.innerHTML = '';
+    const a = randInt(1,20);
+    const b = randInt(1,20);
+    const ops = ['+','-','*'];
+    const op = ops[randInt(0,ops.length-1)];
+    let correct;
+    if(op === '+') correct = a+b;
+    if(op === '-') correct = a-b;
+    if(op === '*') correct = a*b;
+    const h = document.createElement('h2'); h.innerText = `Was ist ${a} ${op} ${b} ?`;
+    area.appendChild(h);
+    const form = document.createElement('div');
+    const input = document.createElement('input'); input.type='number'; input.style.padding='8px'; input.style.fontSize='16px'; input.id='math-input';
+    const sub = document.createElement('button'); sub.className='game-btn'; sub.innerText='Antwort prüfen';
+    sub.onclick = ()=>{
+        const val = parseInt(input.value,10);
+        if(!isNaN(val) && val === correct){ currentScore++; document.getElementById('score').innerText = currentScore; }
+        input.value = '';
+        renderMathProblem();
+    };
+    form.appendChild(input); form.appendChild(sub);
+    area.appendChild(form);
+    // allow Enter
+    input.addEventListener('keydown', (e)=>{ if(e.key === 'Enter') sub.onclick(); });
+}
+
+/* ------------------ LEBENSZYKLUS ------------------ */
+// show menu at load
+showMenu();
+loadHighscores();
+
 </script>
 
 </body>
