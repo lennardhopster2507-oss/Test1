@@ -4,8 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Mein Student Dashboard</title>
-
-https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.jsscript>
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 
 <style>
 :root {
@@ -786,21 +785,74 @@ function saveCalendarLink() {
         return;
     }
 
-    if (link.includes("([^ {
+    // Versuche iframe-src zu extrahieren
+    if (link.includes("src=")) {
+        const srcMatch = link.match(/src="([^"]+)"/);
+        if (srcMatch) link = srcMatch[1];
+    }
+
+    localStorage.setItem("calendarLink", link);
+    loadCalendar();
+}
+
+function loadCalendar() {
+    const link = localStorage.getItem("calendarLink");
+    const frame = document.getElementById("calendarFrame");
+
+    if (link) {
+        frame.src = link;
+    } else {
+        frame.src = "";
+    }
+}
+
+function saveNotes() {
+    const notes = document.getElementById("notesInput").value;
+    localStorage.setItem("notes", notes);
+    alert("Notizen gespeichert.");
+}
+
+function loadNotes() {
+    const notes = localStorage.getItem("notes") || "";
+    document.getElementById("notesInput").value = notes;
+}
+
+async function scanReceipt() {
+    const input = document.getElementById("receiptImage");
+    const file = input.files[0];
+    const status = document.getElementById("ocrStatus");
+    const textBox = document.getElementById("ocrText");
+
+    if (!file) {
+        alert("Bitte wähle eine Datei.");
+        return;
+    }
+
+    status.textContent = "Liest Beleg aus...";
+
+    try {
+        const reader = new FileReader();
+        reader.onload = async function(event) {
+            const img = event.target.result;
+
+            const result = await Tesseract.recognize(img, "deu", {
+                logger: function(m) {
                     if (m.status) {
                         status.textContent = "Status: " + m.status;
                     }
                 }
-            }
-        );
+            });
 
-        const text = result.data.text;
-        textBox.textContent = text || "Kein Text erkannt.";
+            const text = result.data.text;
+            textBox.textContent = text || "Kein Text erkannt.";
 
-        const amounts = extractAmounts(text);
-        showDetectedAmounts(amounts);
+            const amounts = extractAmounts(text);
+            showDetectedAmounts(amounts);
 
-        status.textContent = "Fertig. Bitte erkannte Beträge prüfen.";
+            status.textContent = "Fertig. Bitte erkannte Beträge prüfen.";
+        };
+
+        reader.readAsDataURL(file);
     } catch (error) {
         console.error(error);
         status.textContent = "Fehler beim Auslesen des Belegs.";
