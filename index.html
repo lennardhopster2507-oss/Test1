@@ -38,7 +38,7 @@ body {
 .app {
     max-width: 1250px;
     margin: 0 auto;
-    padding: 16px;
+    padding: 24px;
 }
 
 header {
@@ -47,48 +47,41 @@ header {
     align-items: center;
     gap: 16px;
     margin-bottom: 24px;
-    flex-wrap: wrap;
 }
 
 .header-title h1 {
     margin: 0;
-    font-size: clamp(24px, 5vw, 34px);
+    font-size: 34px;
 }
 
 .header-title p {
     margin: 6px 0 0;
     color: var(--muted);
-    font-size: clamp(12px, 2vw, 14px);
 }
 
 .date-box {
     background: var(--card);
     border: 1px solid var(--border);
-    padding: 12px 16px;
+    padding: 14px 18px;
     border-radius: 18px;
     text-align: right;
-    font-size: clamp(12px, 2vw, 14px);
 }
 
 .nav {
     display: flex;
-    gap: 8px;
+    gap: 10px;
     flex-wrap: wrap;
     margin-bottom: 24px;
-    overflow-x: auto;
-    padding-bottom: 8px;
 }
 
 .nav button {
     border: 1px solid var(--border);
     background: var(--card);
     color: var(--text);
-    padding: 10px 14px;
+    padding: 12px 16px;
     border-radius: 999px;
     cursor: pointer;
-    font-size: clamp(12px, 2vw, 15px);
-    white-space: nowrap;
-    transition: all 0.2s ease;
+    font-size: 15px;
 }
 
 .nav button:hover,
@@ -100,26 +93,25 @@ header {
 .grid {
     display: grid;
     grid-template-columns: repeat(12, 1fr);
-    gap: 16px;
+    gap: 18px;
 }
 
 .card {
     background: var(--card);
     border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 16px;
+    border-radius: 22px;
+    padding: 20px;
     backdrop-filter: blur(12px);
     box-shadow: 0 20px 50px rgba(0,0,0,0.2);
 }
 
 .card h2 {
     margin-top: 0;
-    font-size: clamp(18px, 4vw, 22px);
+    font-size: 22px;
 }
 
 .card h3 {
     margin-top: 0;
-    font-size: clamp(16px, 3vw, 20px);
 }
 
 .col-3 { grid-column: span 3; }
@@ -131,7 +123,7 @@ header {
 .col-12 { grid-column: span 12; }
 
 .stat {
-    font-size: clamp(24px, 6vw, 32px);
+    font-size: 32px;
     font-weight: bold;
 }
 
@@ -148,7 +140,6 @@ input, select, textarea {
     color: var(--text);
     outline: none;
     margin-bottom: 10px;
-    font-size: 16px;
 }
 
 input::placeholder,
@@ -164,13 +155,6 @@ button.primary {
     border-radius: 12px;
     cursor: pointer;
     font-weight: bold;
-    font-size: clamp(13px, 2vw, 15px);
-    transition: all 0.2s ease;
-    width: 100%;
-}
-
-button.primary:active {
-    transform: scale(0.98);
 }
 
 button.secondary {
@@ -180,8 +164,6 @@ button.secondary {
     padding: 10px 14px;
     border-radius: 12px;
     cursor: pointer;
-    font-size: clamp(12px, 2vw, 14px);
-    width: 100%;
 }
 
 button.danger {
@@ -191,8 +173,6 @@ button.danger {
     padding: 8px 10px;
     border-radius: 10px;
     cursor: pointer;
-    font-size: clamp(12px, 2vw, 14px);
-    width: 100%;
 }
 
 .list {
@@ -210,7 +190,6 @@ button.danger {
     background: rgba(255,255,255,0.06);
     border: 1px solid var(--border);
     border-radius: 14px;
-    flex-wrap: wrap;
 }
 
 .badge {
@@ -219,7 +198,7 @@ button.danger {
     border-radius: 999px;
     background: rgba(56,189,248,0.16);
     color: #bae6fd;
-    font-size: clamp(11px, 1.5vw, 13px);
+    font-size: 13px;
 }
 
 .progress {
@@ -262,7 +241,6 @@ button.danger {
     max-height: 260px;
     overflow: auto;
     color: #dbeafe;
-    font-size: clamp(12px, 2vw, 14px);
 }
 
 .category-row {
@@ -270,7 +248,6 @@ button.danger {
     justify-content: space-between;
     border-bottom: 1px solid var(--border);
     padding: 8px 0;
-    font-size: clamp(12px, 2vw, 14px);
 }
 
 /* --- Spielebereich Styles --- */
@@ -287,7 +264,6 @@ button.danger {
     background: rgba(255,255,255,0.03);
     color: var(--text);
     cursor: pointer;
-    font-size: clamp(12px, 2vw, 14px);
 }
 .game-button.active {
     background: var(--yellow);
@@ -325,70 +301,14 @@ button.danger {
 .center {
     text-align:center;
 }
-
-/* --- Urlaubsplanung Styles --- */
-.vacation-selector {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-    margin-bottom: 12px;
-    overflow-x: auto;
-    padding-bottom: 8px;
-}
-
-.vacation-button {
-    padding: 8px 12px;
-    border-radius: 10px;
-    border: 1px solid var(--border);
-    background: rgba(255,255,255,0.03);
-    color: var(--text);
-    cursor: pointer;
-    font-size: clamp(12px, 2vw, 14px);
-    white-space: nowrap;
-    transition: all 0.2s ease;
-}
-
-.vacation-button.active {
-    background: var(--green);
-    color: #020617;
-    font-weight: bold;
-}
-
-.vacation-days {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
-
-.vacation-day {
-    background: rgba(255,255,255,0.04);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 14px;
-}
-
-.vacation-day-title {
-    font-weight: bold;
-    margin-bottom: 8px;
-    color: var(--green);
-    font-size: clamp(14px, 3vw, 16px);
-}
-
-.vacation-day textarea {
-    margin-bottom: 8px;
-    min-height: 100px;
-    font-size: 14px;
-    line-height: 1.5;
-}
-
 footer {
     margin-top: 30px;
     text-align: center;
     color: var(--muted);
-    font-size: clamp(11px, 2vw, 13px);
+    font-size: 13px;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 900px) {
     .col-3, .col-4, .col-5, .col-6, .col-7, .col-8, .col-12 {
         grid-column: span 12;
     }
@@ -401,58 +321,6 @@ footer {
     .date-box {
         text-align: left;
         width: 100%;
-    }
-
-    .app {
-        padding: 12px;
-    }
-
-    .card {
-        padding: 12px;
-    }
-
-    .grid {
-        gap: 12px;
-    }
-
-    .list-item {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-
-    button.primary, button.secondary, button.danger {
-        width: 100%;
-    }
-}
-
-@media (max-width: 480px) {
-    .header-title h1 {
-        font-size: 20px;
-    }
-
-    .card h2 {
-        font-size: 16px;
-    }
-
-    .app {
-        padding: 8px;
-    }
-
-    .card {
-        padding: 10px;
-    }
-
-    .grid {
-        gap: 10px;
-    }
-
-    input, select, textarea {
-        padding: 10px;
-        font-size: 16px;
-    }
-
-    .vacation-day textarea {
-        min-height: 80px;
     }
 }
 </style>
@@ -479,7 +347,6 @@ footer {
     <button onclick="showSection('receipts', this)">Belege scannen</button>
     <button onclick="showSection('calendar', this)">Kalender</button>
     <button onclick="showSection('notes', this)">Notizen</button>
-    <button onclick="showSection('vacation', this)">Urlaub</button>
     <button onclick="showSection('games', this)">Spielebereich Alina</button>
 </nav>
 
@@ -674,37 +541,6 @@ footer {
     </div>
 </section>
 
-<!-- Urlaubsplanung Sektion -->
-<section id="vacation" class="section">
-    <div class="grid">
-        <div class="card col-4">
-            <h2>Urlaubsplanung</h2>
-            <p class="muted">Erstelle einen neuen Urlaub oder wähle einen aus.</p>
-
-            <input id="vacationNameInput" placeholder="Name des Urlaubs, z. B. Mittelmeer">
-            <input id="vacationStartDate" type="date">
-            <input id="vacationEndDate" type="date">
-            <button class="primary" onclick="createVacation()">Urlaub erstellen</button>
-
-            <p class="muted" style="margin-top: 16px;">Meine Urlaube:</p>
-            <div class="vacation-selector" id="vacationList"></div>
-        </div>
-
-        <div class="card col-8">
-            <h2 id="vacationTitle">Kein Urlaub ausgewählt</h2>
-            <p class="muted" id="vacationDateRange"></p>
-
-            <div class="vacation-days" id="vacationDaysContainer">
-                <p class="muted">Wähle einen Urlaub aus, um die Tage zu planen.</p>
-            </div>
-
-            <div style="margin-top: 16px;">
-                <button class="danger" onclick="deleteVacation()" id="deleteVacationBtn" style="display:none;">Urlaub löschen</button>
-            </div>
-        </div>
-    </div>
-</section>
-
 <!-- Neue Sektion: Spielebereich Alina -->
 <section id="games" class="section">
     <div class="grid">
@@ -742,24 +578,6 @@ footer {
 let expenses = JSON.parse(localStorage.getItem("expenses") || "[]");
 let shoppingItems = JSON.parse(localStorage.getItem("shoppingItems") || "[]");
 let monthlyBudget = parseFloat(localStorage.getItem("monthlyBudget") || "0");
-let vacations = JSON.parse(localStorage.getItem("vacations") || "[]");
-let selectedVacationId = null;
-
-// Standardurlaub initialisieren, wenn leer
-if (vacations.length === 0) {
-    vacations = [{
-        id: Date.now(),
-        name: "Griechenland",
-        startDate: "2025-09-12",
-        endDate: "2025-09-14",
-        days: {
-            "2025-09-12": "08:00 Frühstück\n09:00 Areopag-Felsen\n(bester kostenloser Akropolis-Blick)\n10:00 Philopappos-Hügel\n(Aussicht über Athen)\n11:30 Plaka erkunden\n13:00 Mittagessen\n(Moussaka, Souvlaki, griechischer Salat)\n14:00 Anafiotika\n(weiße Häuser, Insel-Feeling)\n15:00 Monastiraki\n(Flohmarkt, Gassen, Café)\n16:30 Hadrianstor & Olympieion\n(von außen anschauen)\n17:00 Hotelpause\n18:30 Lycabettus-Hügel\n(Taxi/Uber hoch)\nSonnenuntergang genießen\n20:00 Rooftop-Restaurant\nmit Akropolis-Blick\n22:00 Drinks in Psyrri oder Monastiraki",
-            "2025-09-13": "",
-            "2025-09-14": ""
-        }
-    }];
-    localStorage.setItem("vacations", JSON.stringify(vacations));
-}
 
 function formatEuro(value) {
     return Number(value).toLocaleString("de-DE", {
@@ -793,7 +611,6 @@ function sectionName(id) {
     if (id === "receipts") return "belege";
     if (id === "calendar") return "kalender";
     if (id === "notes") return "notizen";
-    if (id === "vacation") return "urlaub";
     if (id === "games") return "spiele";
     return "übersicht";
 }
@@ -1048,6 +865,7 @@ function saveCalendarLink() {
         return;
     }
 
+    // Versuche iframe-src zu extrahieren
     if (link.includes("src=")) {
         const srcMatch = link.match(/src="([^"]+)"/);
         if (srcMatch) link = srcMatch[1];
@@ -1079,137 +897,6 @@ function loadNotes() {
     document.getElementById("notesInput").value = notes;
 }
 
-// --- Urlaubsplanung Funktionen ---
-function createVacation() {
-    const name = document.getElementById("vacationNameInput").value.trim();
-    const startDate = document.getElementById("vacationStartDate").value;
-    const endDate = document.getElementById("vacationEndDate").value;
-
-    if (!name || !startDate || !endDate) {
-        alert("Bitte alle Felder ausfüllen.");
-        return;
-    }
-
-    if (new Date(startDate) > new Date(endDate)) {
-        alert("Das Enddatum muss nach dem Startdatum liegen.");
-        return;
-    }
-
-    const vacation = {
-        id: Date.now(),
-        name,
-        startDate,
-        endDate,
-        days: {}
-    };
-
-    const current = new Date(startDate);
-    while (current <= new Date(endDate)) {
-        const dateKey = current.toISOString().split('T')[0];
-        vacation.days[dateKey] = "";
-        current.setDate(current.getDate() + 1);
-    }
-
-    vacations.push(vacation);
-    localStorage.setItem("vacations", JSON.stringify(vacations));
-
-    document.getElementById("vacationNameInput").value = "";
-    document.getElementById("vacationStartDate").value = "";
-    document.getElementById("vacationEndDate").value = "";
-
-    refreshVacations();
-}
-
-function refreshVacations() {
-    const list = document.getElementById("vacationList");
-    list.innerHTML = "";
-
-    vacations.forEach(vacation => {
-        const button = document.createElement("button");
-        button.className = "vacation-button";
-        if (selectedVacationId === vacation.id) button.classList.add("active");
-        button.textContent = vacation.name;
-        button.onclick = () => selectVacation(vacation.id);
-        list.appendChild(button);
-    });
-
-    if (selectedVacationId) {
-        refreshVacationDetails();
-    } else {
-        document.getElementById("vacationTitle").textContent = "Kein Urlaub ausgewählt";
-        document.getElementById("vacationDateRange").textContent = "";
-        document.getElementById("vacationDaysContainer").innerHTML = `<p class="muted">Wähle einen Urlaub aus, um die Tage zu planen.</p>`;
-        document.getElementById("deleteVacationBtn").style.display = "none";
-    }
-}
-
-function selectVacation(id) {
-    selectedVacationId = id;
-    refreshVacationDetails();
-}
-
-function refreshVacationDetails() {
-    if (!selectedVacationId) return;
-
-    const vacation = vacations.find(v => v.id === selectedVacationId);
-    if (!vacation) return;
-
-    document.getElementById("vacationTitle").textContent = vacation.name;
-    document.getElementById("vacationDateRange").textContent = `${new Date(vacation.startDate).toLocaleDateString("de-DE")} - ${new Date(vacation.endDate).toLocaleDateString("de-DE")}`;
-
-    const container = document.getElementById("vacationDaysContainer");
-    container.innerHTML = "";
-
-    const daysArray = Object.keys(vacation.days).sort();
-    daysArray.forEach((dateKey, index) => {
-        const date = new Date(dateKey + "T00:00:00");
-        const dayName = date.toLocaleDateString("de-DE", { weekday: "long", day: "2-digit", month: "long" });
-
-        const dayDiv = document.createElement("div");
-        dayDiv.className = "vacation-day";
-        dayDiv.innerHTML = `
-            <div class="vacation-day-title">Tag ${index + 1}: ${dayName}</div>
-            <textarea placeholder="Was möchte ich an diesem Tag machen?" onchange="updateVacationDay('${dateKey}', this.value)">${vacation.days[dateKey]}</textarea>
-            <button class="secondary" onclick="clearVacationDay('${dateKey}')">Löschen</button>
-        `;
-        container.appendChild(dayDiv);
-    });
-
-    document.getElementById("deleteVacationBtn").style.display = "block";
-    document.getElementById("deleteVacationBtn").onclick = () => {
-        if (confirm(`Möchtest du den Urlaub "${vacation.name}" wirklich löschen?`)) {
-            vacations = vacations.filter(v => v.id !== selectedVacationId);
-            localStorage.setItem("vacations", JSON.stringify(vacations));
-            selectedVacationId = null;
-            refreshVacations();
-        }
-    };
-
-    refreshVacations();
-}
-
-function updateVacationDay(dateKey, content) {
-    if (!selectedVacationId) return;
-
-    const vacation = vacations.find(v => v.id === selectedVacationId);
-    if (vacation) {
-        vacation.days[dateKey] = content;
-        localStorage.setItem("vacations", JSON.stringify(vacations));
-    }
-}
-
-function clearVacationDay(dateKey) {
-    if (!selectedVacationId) return;
-
-    const vacation = vacations.find(v => v.id === selectedVacationId);
-    if (vacation) {
-        vacation.days[dateKey] = "";
-        localStorage.setItem("vacations", JSON.stringify(vacations));
-        refreshVacationDetails();
-    }
-}
-
-// --- OCR Funktionen ---
 async function scanReceipt() {
     const input = document.getElementById("receiptImage");
     const file = input.files[0];
@@ -1308,14 +995,9 @@ function refreshAll() {
     refreshOverview();
     refreshExpenses();
     refreshShopping();
-    refreshVacations();
     loadCalendar();
     loadNotes();
 }
-
-// Initial load
-refreshVacations();
-refreshAll();
 </script>
 
 </body>
