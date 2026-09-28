@@ -301,6 +301,54 @@ button.danger {
 .center {
     text-align:center;
 }
+
+/* --- Urlaubsplanung Styles --- */
+.vacation-selector {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+}
+
+.vacation-button {
+    padding: 8px 12px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: rgba(255,255,255,0.03);
+    color: var(--text);
+    cursor: pointer;
+}
+
+.vacation-button.active {
+    background: var(--green);
+    color: #020617;
+    font-weight: bold;
+}
+
+.vacation-days {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.vacation-day {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 14px;
+}
+
+.vacation-day-title {
+    font-weight: bold;
+    margin-bottom: 8px;
+    color: var(--green);
+}
+
+.vacation-day textarea {
+    margin-bottom: 8px;
+    min-height: 80px;
+}
+
 footer {
     margin-top: 30px;
     text-align: center;
@@ -347,6 +395,7 @@ footer {
     <button onclick="showSection('receipts', this)">Belege scannen</button>
     <button onclick="showSection('calendar', this)">Kalender</button>
     <button onclick="showSection('notes', this)">Notizen</button>
+    <button onclick="showSection('vacation', this)">Urlaubsplanung</button>
     <button onclick="showSection('games', this)">Spielebereich Alina</button>
 </nav>
 
@@ -541,6 +590,37 @@ footer {
     </div>
 </section>
 
+<!-- Urlaubsplanung Sektion -->
+<section id="vacation" class="section">
+    <div class="grid">
+        <div class="card col-4">
+            <h2>Urlaubsplanung</h2>
+            <p class="muted">Erstelle einen neuen Urlaub oder wähle einen aus.</p>
+
+            <input id="vacationNameInput" placeholder="Name des Urlaubs, z. B. Mittelmeer">
+            <input id="vacationStartDate" type="date">
+            <input id="vacationEndDate" type="date">
+            <button class="primary" onclick="createVacation()">Urlaub erstellen</button>
+
+            <p class="muted" style="margin-top: 16px;">Meine Urlaube:</p>
+            <div class="vacation-selector" id="vacationList"></div>
+        </div>
+
+        <div class="card col-8">
+            <h2 id="vacationTitle">Kein Urlaub ausgewählt</h2>
+            <p class="muted" id="vacationDateRange"></p>
+
+            <div class="vacation-days" id="vacationDaysContainer">
+                <p class="muted">Wähle einen Urlaub aus, um die Tage zu planen.</p>
+            </div>
+
+            <div style="margin-top: 16px;">
+                <button class="danger" onclick="deleteVacation()" id="deleteVacationBtn" style="display:none;">Urlaub löschen</button>
+            </div>
+        </div>
+    </div>
+</section>
+
 <!-- Neue Sektion: Spielebereich Alina -->
 <section id="games" class="section">
     <div class="grid">
@@ -578,6 +658,8 @@ footer {
 let expenses = JSON.parse(localStorage.getItem("expenses") || "[]");
 let shoppingItems = JSON.parse(localStorage.getItem("shoppingItems") || "[]");
 let monthlyBudget = parseFloat(localStorage.getItem("monthlyBudget") || "0");
+let vacations = JSON.parse(localStorage.getItem("vacations") || "[]");
+let selectedVacationId = null;
 
 function formatEuro(value) {
     return Number(value).toLocaleString("de-DE", {
@@ -611,6 +693,7 @@ function sectionName(id) {
     if (id === "receipts") return "belege";
     if (id === "calendar") return "kalender";
     if (id === "notes") return "notizen";
+    if (id === "vacation") return "urlaub";
     if (id === "games") return "spiele";
     return "übersicht";
 }
@@ -897,6 +980,138 @@ function loadNotes() {
     document.getElementById("notesInput").value = notes;
 }
 
+// --- Urlaubsplanung Funktionen ---
+function createVacation() {
+    const name = document.getElementById("vacationNameInput").value.trim();
+    const startDate = document.getElementById("vacationStartDate").value;
+    const endDate = document.getElementById("vacationEndDate").value;
+
+    if (!name || !startDate || !endDate) {
+        alert("Bitte alle Felder ausfüllen.");
+        return;
+    }
+
+    if (new Date(startDate) > new Date(endDate)) {
+        alert("Das Enddatum muss nach dem Startdatum liegen.");
+        return;
+    }
+
+    const vacation = {
+        id: Date.now(),
+        name,
+        startDate,
+        endDate,
+        days: {}
+    };
+
+    // Generiere Tage
+    const current = new Date(startDate);
+    while (current <= new Date(endDate)) {
+        const dateKey = current.toISOString().split('T')[0];
+        vacation.days[dateKey] = "";
+        current.setDate(current.getDate() + 1);
+    }
+
+    vacations.push(vacation);
+    localStorage.setItem("vacations", JSON.stringify(vacations));
+
+    document.getElementById("vacationNameInput").value = "";
+    document.getElementById("vacationStartDate").value = "";
+    document.getElementById("vacationEndDate").value = "";
+
+    refreshVacations();
+}
+
+function refreshVacations() {
+    const list = document.getElementById("vacationList");
+    list.innerHTML = "";
+
+    vacations.forEach(vacation => {
+        const button = document.createElement("button");
+        button.className = "vacation-button";
+        if (selectedVacationId === vacation.id) button.classList.add("active");
+        button.textContent = vacation.name;
+        button.onclick = () => selectVacation(vacation.id);
+        list.appendChild(button);
+    });
+
+    if (selectedVacationId) {
+        refreshVacationDetails();
+    } else {
+        document.getElementById("vacationTitle").textContent = "Kein Urlaub ausgewählt";
+        document.getElementById("vacationDateRange").textContent = "";
+        document.getElementById("vacationDaysContainer").innerHTML = `<p class="muted">Wähle einen Urlaub aus, um die Tage zu planen.</p>`;
+        document.getElementById("deleteVacationBtn").style.display = "none";
+    }
+}
+
+function selectVacation(id) {
+    selectedVacationId = id;
+    refreshVacationDetails();
+}
+
+function refreshVacationDetails() {
+    if (!selectedVacationId) return;
+
+    const vacation = vacations.find(v => v.id === selectedVacationId);
+    if (!vacation) return;
+
+    document.getElementById("vacationTitle").textContent = vacation.name;
+    document.getElementById("vacationDateRange").textContent = `${new Date(vacation.startDate).toLocaleDateString("de-DE")} - ${new Date(vacation.endDate).toLocaleDateString("de-DE")}`;
+
+    const container = document.getElementById("vacationDaysContainer");
+    container.innerHTML = "";
+
+    const daysArray = Object.keys(vacation.days).sort();
+    daysArray.forEach((dateKey, index) => {
+        const date = new Date(dateKey + "T00:00:00");
+        const dayName = date.toLocaleDateString("de-DE", { weekday: "long", day: "2-digit", month: "long" });
+
+        const dayDiv = document.createElement("div");
+        dayDiv.className = "vacation-day";
+        dayDiv.innerHTML = `
+            <div class="vacation-day-title">Tag ${index + 1}: ${dayName}</div>
+            <textarea placeholder="Was möchte ich an diesem Tag machen? (z. B. Strand, Museumsbesuch, etc.)" onchange="updateVacationDay('${dateKey}', this.value)">${vacation.days[dateKey]}</textarea>
+            <button class="secondary" onclick="clearVacationDay('${dateKey}')">Löschen</button>
+        `;
+        container.appendChild(dayDiv);
+    });
+
+    document.getElementById("deleteVacationBtn").style.display = "block";
+    document.getElementById("deleteVacationBtn").onclick = () => {
+        if (confirm(`Möchtest du den Urlaub "${vacation.name}" wirklich löschen?`)) {
+            vacations = vacations.filter(v => v.id !== selectedVacationId);
+            localStorage.setItem("vacations", JSON.stringify(vacations));
+            selectedVacationId = null;
+            refreshVacations();
+        }
+    };
+
+    refreshVacations();
+}
+
+function updateVacationDay(dateKey, content) {
+    if (!selectedVacationId) return;
+
+    const vacation = vacations.find(v => v.id === selectedVacationId);
+    if (vacation) {
+        vacation.days[dateKey] = content;
+        localStorage.setItem("vacations", JSON.stringify(vacations));
+    }
+}
+
+function clearVacationDay(dateKey) {
+    if (!selectedVacationId) return;
+
+    const vacation = vacations.find(v => v.id === selectedVacationId);
+    if (vacation) {
+        vacation.days[dateKey] = "";
+        localStorage.setItem("vacations", JSON.stringify(vacations));
+        refreshVacationDetails();
+    }
+}
+
+// --- OCR Funktionen ---
 async function scanReceipt() {
     const input = document.getElementById("receiptImage");
     const file = input.files[0];
@@ -995,245 +1210,13 @@ function refreshAll() {
     refreshOverview();
     refreshExpenses();
     refreshShopping();
+    refreshVacations();
     loadCalendar();
     loadNotes();
 }
 
-/* ----------------- Spielebereich JS ----------------- */
-
-let currentGame = 'ttt';
-let tttState = Array(9).fill(null);
-let tttTurn = 'X';
-
-function showGame(gameId, btn) {
-    currentGame = gameId;
-    document.querySelectorAll('.game-button').forEach(b => b.classList.remove('active'));
-    if (btn) btn.classList.add('active');
-
-    const title = {
-        ttt: 'Tic-Tac-Toe',
-        reaction: 'Reaktionstest',
-        click: 'Klick-Rennen',
-        rps: 'Schere / Stein / Papier'
-    }[gameId] || 'Spiel';
-
-    document.getElementById('gameTitle').textContent = title;
-    document.getElementById('gameFooter').textContent = '';
-
-    const area = document.getElementById('gameArea');
-    area.innerHTML = '';
-
-    if (gameId === 'ttt') renderTTT(area);
-    if (gameId === 'reaction') renderReaction(area);
-    if (gameId === 'click') renderClickRace(area);
-    if (gameId === 'rps') renderRPS(area);
-}
-
-function renderTTT(container) {
-    tttState = Array(9).fill(null);
-    tttTurn = 'X';
-    const board = document.createElement('div');
-    board.className = 'ttt-grid';
-    for (let i = 0; i < 9; i++) {
-        const cell = document.createElement('div');
-        cell.className = 'ttt-cell';
-        cell.dataset.idx = i;
-        cell.addEventListener('click', () => {
-            if (tttState[i] || checkWinner(tttState)) return;
-            tttState[i] = tttTurn;
-            tttTurn = tttTurn === 'X' ? 'O' : 'X';
-            updateTTT(board);
-            const winner = checkWinner(tttState);
-            if (winner) {
-                document.getElementById('gameFooter').textContent = `Spiel beendet — Gewinner: ${winner}`;
-            } else if (tttState.every(Boolean)) {
-                document.getElementById('gameFooter').textContent = 'Unentschieden!';
-            }
-        });
-        board.appendChild(cell);
-    }
-    const reset = document.createElement('button');
-    reset.className = 'primary';
-    reset.style.marginTop = '12px';
-    reset.textContent = 'Neu starten';
-    reset.addEventListener('click', () => renderTTT(container));
-    container.appendChild(board);
-    container.appendChild(reset);
-    updateTTT(board);
-}
-
-function updateTTT(board) {
-    for (let i = 0; i < 9; i++) {
-        board.children[i].textContent = tttState[i] || '';
-    }
-}
-
-function checkWinner(board) {
-    const lines = [
-        [0,1,2],[3,4,5],[6,7,8],
-        [0,3,6],[1,4,7],[2,5,8],
-        [0,4,8],[2,4,6]
-    ];
-    for (const [a,b,c] of lines) {
-        if (board[a] && board[a] === board[b] && board[a] === board[c]) return board[a];
-    }
-    return null;
-}
-
-/* Reaktionstest */
-let reactionTimeout = null;
-let reactionStart = null;
-function renderReaction(container) {
-    container.innerHTML = '';
-    const box = document.createElement('div');
-    box.className = 'reaction-box';
-    box.style.background = 'rgba(255,255,255,0.03)';
-    box.textContent = 'Klick um vorzubereiten';
-    container.appendChild(box);
-
-    box.addEventListener('click', () => {
-        if (reactionTimeout) {
-            // während Wartezeit: false click
-            const diff = Date.now() - reactionStart;
-            if (reactionStart) {
-                document.getElementById('gameFooter').textContent = `Zu früh geklickt! (${diff}ms) Versuch nochmal.`;
-            }
-            clearTimeout(reactionTimeout);
-            reactionTimeout = null;
-            reactionStart = null;
-            box.style.background = 'rgba(255,255,255,0.03)';
-            box.textContent = 'Klick um vorzubereiten';
-            return;
-        }
-
-        box.textContent = 'Warte auf Grün...';
-        box.style.background = 'orange';
-        document.getElementById('gameFooter').textContent = '';
-        const delay = 1000 + Math.random() * 2500;
-        reactionTimeout = setTimeout(() => {
-            box.style.background = 'var(--green)';
-            box.textContent = 'JETZT!';
-            reactionStart = Date.now();
-            // set listener for actual reaction
-            const clickHandler = () => {
-                const rt = Date.now() - reactionStart;
-                document.getElementById('gameFooter').textContent = `Reaktionszeit: ${rt} ms — nicht schlecht!`;
-                box.removeEventListener('click', clickHandler);
-                reactionTimeout = null;
-                reactionStart = null;
-                box.style.background = 'rgba(255,255,255,0.03)';
-                box.textContent = 'Klick um vorzubereiten';
-            };
-            box.addEventListener('click', clickHandler, { once: true });
-        }, delay);
-    });
-}
-
-/* Klick-Rennen */
-let clickCounter = 0;
-let clickTimer = null;
-function renderClickRace(container) {
-    container.innerHTML = '';
-    const info = document.createElement('div');
-    info.className = 'center muted';
-    info.textContent = 'Klicke so oft du kannst in 5 Sekunden!';
-    const btn = document.createElement('button');
-    btn.className = 'primary';
-    btn.textContent = 'KLICK!';
-    btn.style.fontSize = '22px';
-    btn.style.padding = '18px 28px';
-    btn.disabled = true;
-
-    const start = document.createElement('button');
-    start.className = 'secondary';
-    start.textContent = 'Start (5s)';
-    start.addEventListener('click', () => {
-        clickCounter = 0;
-        btn.disabled = false;
-        btn.textContent = 'KLICK!';
-        document.getElementById('gameFooter').textContent = 'Viel Erfolg!';
-        let remaining = 5;
-        start.disabled = true;
-        clickTimer = setInterval(() => {
-            remaining--;
-            if (remaining <= 0) {
-                clearInterval(clickTimer);
-                clickTimer = null;
-                btn.disabled = true;
-                start.disabled = false;
-                document.getElementById('gameFooter').textContent = `Fertig! Deine Klicks: ${clickCounter}`;
-            }
-        }, 1000);
-        setTimeout(() => {
-            // ensure timer end
-            if (clickTimer) {
-                clearInterval(clickTimer);
-                clickTimer = null;
-                btn.disabled = true;
-                start.disabled = false;
-                document.getElementById('gameFooter').textContent = `Fertig! Deine Klicks: ${clickCounter}`;
-            }
-        }, 5000);
-    });
-
-    btn.addEventListener('click', () => {
-        clickCounter++;
-        btn.textContent = `Klicks: ${clickCounter}`;
-    });
-
-    container.appendChild(info);
-    container.appendChild(btn);
-    container.appendChild(document.createElement('br'));
-    container.appendChild(document.createElement('br'));
-    container.appendChild(start);
-}
-
-/* Schere / Stein / Papier */
-function renderRPS(container) {
-    container.innerHTML = '';
-    const info = document.createElement('div');
-    info.className = 'muted';
-    info.textContent = 'Wähle: Schere, Stein oder Papier. Gewinnt das bessere Element!';
-    const opts = ['Schere', 'Stein', 'Papier'];
-    const btnRow = document.createElement('div');
-    btnRow.style.display = 'flex';
-    btnRow.style.gap = '8px';
-    btnRow.style.marginTop = '8px';
-
-    opts.forEach(opt => {
-        const b = document.createElement('button');
-        b.className = 'primary';
-        b.textContent = opt;
-        b.addEventListener('click', () => {
-            const comp = opts[Math.floor(Math.random() * 3)];
-            const result = rpsResult(opt, comp);
-            document.getElementById('gameFooter').textContent = `Du: ${opt} · Gegner: ${comp} → ${result}`;
-        });
-        btnRow.appendChild(b);
-    });
-
-    container.appendChild(info);
-    container.appendChild(btnRow);
-}
-
-function rpsResult(user, comp) {
-    if (user === comp) return 'Unentschieden';
-    if (
-        (user === 'Schere' && comp === 'Papier') ||
-        (user === 'Papier' && comp === 'Stein') ||
-        (user === 'Stein' && comp === 'Schere')
-    ) return 'Du gewinnst 🎉';
-    return 'Du verlierst 😅';
-}
-
-/* --- init Spielebereich default --- */
-document.addEventListener('DOMContentLoaded', () => {
-    // default Spiel rendern
-    showGame('ttt');
-});
-
-/* ----------------- Ende Spielebereich JS ----------------- */
-
+// Initial load
+refreshVacations();
 refreshAll();
 </script>
 
